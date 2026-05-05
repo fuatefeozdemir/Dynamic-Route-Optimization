@@ -1,7 +1,7 @@
 //
 // Created by Efe on 5.05.2026.
 //
-
+//bu dosyayi bi  kere okuduysa bi daha tekrar tekrar okumasin diye
 #ifndef ROUTEENGINE_QUEUE_H
 #define ROUTEENGINE_QUEUE_H
 
@@ -10,11 +10,14 @@
 
 // Kuyruktaki her bir düğümün yapısı
 struct QueueNode {
-    int data;
+  /*önce Node olarak doğar, sonra LinkedList'in içinde bir hedef olarak okunur,
+en son da sırası gelene kadar beklemesi için Queue'nun içine data olarak atılır.
+   */
+    int data;//bu da yine linkedlist TargetNodeId ve Node id nin aynisi
     QueueNode* next;
 
     // Kurucu metot (Yeni bir yapı oluşturulduğunda çağrılır)
-    QueueNode(int val) : data(val), next(nullptr) {}
+    QueueNode(int val) : data(val), next(nullptr) {}//hızlı yazımı
 };
 
 class Queue {

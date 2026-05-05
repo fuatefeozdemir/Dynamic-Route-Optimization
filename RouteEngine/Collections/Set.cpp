@@ -30,7 +30,8 @@ void Set::Add(int id) {
     }
 }
 
-// Kümeden ID çıkarma
+//Kümede bu ID var mi
+//zaten gitmis miydim
 bool Set::Contains(int id) const {
     if (id >= 0 && id < capacity) {
         return items[id];
@@ -39,8 +40,11 @@ bool Set::Contains(int id) const {
 }
 
 // Kümeyi sıfırlama
+//yeni haritaya hazirlik
 void Set::Clear() {
     for (int i = 0; i < capacity; i++) {
         items[i] = false;
+        //constructor da for dongusu ile de yapiyoruz aslinda
+        //ama bunu istedigimiz zaman cagirip kullanabiliriz.
     }
 }

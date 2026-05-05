@@ -3,6 +3,7 @@
 // Constructor:
 // Bir Node oluşturulduğunda ilk değerleri burada atanır.
 Node::Node(int _id, int _x, int _y) {
+  //graftan geliyo
     id = _id;
     //Dışarıdan gelen X ve Y yi Point paketinin içine koyup coordinate degiskenine atıyoruz.
     coordinate = Point(_x, _y);
@@ -11,6 +12,7 @@ Node::Node(int _id, int _x, int _y) {
     // Dijkstra algoritması için kural:
     // Başlangıçta tüm mesafeler sonsuz kabul edilir. 
     // Sonsuzluğu temsil etmesi için çok büyük bir sayı giriyoruz.
+    //bunu max yapıyoruz kı daha kısa yolda guncelleyıp gecis yapsin
     distance = 999999.0f;       
     
     // Henüz hiçbir yerden gelinmediği için önceki düğüm -1 (Yok) kabul edilir.

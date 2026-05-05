@@ -12,4 +12,5 @@ struct Point {
         X = _x;
         Y = _y;
     }
-};
+};//aynı anda fonk sadece tek sey dondurebilir hem x hem y alabilmek icin
+//kolaylik olsun diye point kullandık

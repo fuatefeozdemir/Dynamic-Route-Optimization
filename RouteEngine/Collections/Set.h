@@ -7,11 +7,10 @@
 
 #pragma once
 
-#pragma once
-
 class Set {
 private:
     bool* items;
+    //dinamik dizi *
     int capacity;
 
 public:
@@ -23,4 +22,4 @@ public:
     void Clear();
 };
 
-#endif //ROUTEENGINE_SET_H
+#endif //ROUTEENGINE_SET_H//okuma bitti buraya kadar

@@ -1,10 +1,13 @@
 //
 // Created by Efe on 5.05.2026.
 //
-
+//Sığ Öncelikli Arama (BFS - Breadth First Search) saglar
+//yani adım adım ılerler komsudan komsuya atlamaz  Stack ile yapılan Derinlik Öncelikli Arama - DFS onune gecer
+//butun yapıyı atlaya altaya bosuna dolasmak yerıne en yakındakılerden emın olarak ılerler
 #include "Queue.h"
 
 // Kurucu Metot (Başlangıçta front ve rear null)
+//ilk acilista kimse yok
 Queue::Queue() {
     front = nullptr;
     rear = nullptr;
