@@ -8,6 +8,8 @@ add_library(RouteEngine SHARED
         API/EngineAPI.cpp
         Collections/Set.cpp
         Collections/Set.h
+        Collections/Queue.cpp
+        Collections/Queue.h
 )
 
 # DLL dosyasının nereye çıkacağını belirler
