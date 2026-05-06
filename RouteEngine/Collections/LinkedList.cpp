@@ -1,4 +1,4 @@
-#include "LinkedList.h" //linkedlist.h ı baglasin ki ne oldugunu bilsin
+#include "LinkedList.h"
 // 1. Kurucu (İstasyon ilk açıldığında tren boştur)
 LinkedList::LinkedList() {
     head = nullptr;

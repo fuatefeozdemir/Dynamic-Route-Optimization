@@ -1,5 +1,5 @@
 #pragma once
-#include "Point.h" // Point struct'ımızı bu dosyaya dahil ediyoruz
+#include "Point.h"
 
 class Node {
 private:

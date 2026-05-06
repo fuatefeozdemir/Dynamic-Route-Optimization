@@ -1,4 +1,4 @@
-#include "Node.h"   //Node dosyasını bu dosyaya bağlar.
+#include "Node.h"
 
 // Constructor:
 // Bir Node oluşturulduğunda ilk değerleri burada atanır.

@@ -18,30 +18,35 @@ Queue::~Queue() {
     Clear();
 }
 
-// Kuyruğun en arkasına eleman ekler
+// Kuyruğun en arkasına eleman ekleyen fonksiyon
 void Queue::Enqueue(int id) {
     QueueNode* newNode = new QueueNode(id);
 
+    // Eğer kuyruk boşsa eklenen düğüm hem baş hem kuyruktur
     if (rear == nullptr) {
         front = rear = newNode;
         return;
     }
 
+    // Eğer kuyruk boşsa kuyruğun sonuna eklenir ve eklenen düğüm kuyruk olur
     rear->next = newNode;
     rear = newNode;
 }
 
-// Kuyruğun başındaki elemanı çıkarır
+// Kuyruğun başındaki elemanı çıkaran fonksiyon
 int Queue::Dequeue() {
 
+    // Kuyruk boşsa çıkar
     if (IsEmpty()) {
         return -1;
     }
+
     QueueNode* temp = front;
     int id = temp->data;
 
     front = front->next;
 
+    // Eğer kuyruktan eleman çıkarıldığında tamamen boşalıyorsa kuyruğu da null yapar
     if (front == nullptr) {
         rear = nullptr;
     }
