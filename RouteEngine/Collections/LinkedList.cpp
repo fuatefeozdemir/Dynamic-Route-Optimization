@@ -3,7 +3,15 @@
 LinkedList::LinkedList() {
     head = nullptr;
 }
-
+void LinkedList::Clear() {
+    Edge* current = head;
+    while (current != nullptr) {
+        Edge* next = current->next;
+        delete current;
+        current = next;
+    }
+    head = nullptr; // Listeyi boşa çıkar
+}
 
 LinkedList::~LinkedList() {
     //:: bu kapsam cozunurluk oprt. bu sınıfın bu metoduna yazıyorum demek
@@ -17,7 +25,20 @@ LinkedList::~LinkedList() {
     }
     head = nullptr;
 }
+void LinkedList::AddEdge(int targetId, int weight) {
+    //Hafızadan yeni bir "Halka" (ListNode) siparişi veriyoruz.
+    ListNode* newNode = new ListNode();
 
+    //Halkanın içine komşu bilgilerini yazıyoruz.
+    newNode->id = targetId;
+    newNode->weight = weight;
+
+    //Yeni halkayı listenin en başına bağlıyoruz.
+    // Yeni halkanın 'next'i, şu an listenin başında ne varsa orayı göstersin.
+    newNode->next = head;
+
+    head = newNode;
+}
 //3.Ekleme İşlemi (Vagonları üretip birbirine bağlama)
 void LinkedList::Insert(int targetId, float weight) {
     //Yeni vagonu RAM'de üret (new komutu ile)

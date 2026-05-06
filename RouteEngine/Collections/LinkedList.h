@@ -30,6 +30,9 @@ public:// dısardan degisim sadece burdakı parcalarla yapilabilir bunlara erisi
     ~LinkedList();//~yikici oldugunu gosteriyo bitirir
 
     //Temel İşlevler
+    void AddEdge(int targetId, int weight);//graph için gereken
     void Insert(int targetId, float weight); //su numaralı yenı komsuyu ekle dıyen fonk
+    // LinkedList.h içinde olması gereken:
+    void Clear();
     ListNode* GetHead(); //Djikstra ekleyecegi yeri bilsin diye headi verir
 };
