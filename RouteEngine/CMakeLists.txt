@@ -6,12 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 # ÖNEMLİ: Bu satır .exe yerine C# için gerekli olan .dll üretir.
 add_library(RouteEngine SHARED
         API/EngineAPI.cpp
-        Collections/LinkedList.cpp
-        Collections/Queue.cpp
-        Collections/Set.cpp
-        Core/Node.cpp
-        Core/Node.h
-        Core/Point.h
+        Collections/LinkedList.h
+        Graph/GridGraph.cpp
+        Graph/GridGraph.h
 )
 
 # DLL dosyasının nereye çıkacağını belirler
