@@ -12,7 +12,12 @@ file(GLOB_RECURSE SOURCE_FILES
 
 # 2. ADIM: Manuel dosya listesi yerine bu otomatik toplanan listeyi kullanır.
 # ÖNEMLİ: C# için gerekli olan .dll üretir.
-add_library(RouteEngine SHARED ${SOURCE_FILES})
+add_library(RouteEngine SHARED ${SOURCE_FILES}
+        Core/Metrics.h
+        Core/Timer.cpp
+        Core/Timer.h
+        PriorityQueues/ArrayQueue.cpp
+        PriorityQueues/ArrayQueue.h)
 
 set_target_properties(RouteEngine PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build_dll"
