@@ -12,13 +12,13 @@ private:
     //Node ve LinkedList nesnelerini tutacak dinamik diziler (Pointer Array)
     Node** nodes;                 //Tüm hücreleri tutacağımız depo //X, Y koordinatları ve engel olup olmadığını saklar
     LinkedList* adjacencyList;    //Her hücrenin komşularını tutacağımız depo
-    //ücrelerin birbirleriyle olan geçerli hareket yolları komşular.
+    //Hücrelerin birbirleriyle olan geçerli hareket yolları komşular.
 public:
 
     //Kurucu Metot: Haritayı genişlik ve yüksekliğe göre inşa eder
     GridGraph(int _width, int _height);
 
-//LinkedList teki idlere ore kutunun ozelliklerini(dolu,boş..)kontrol eder
+//LinkedList teki idlere gore kutunun ozelliklerini(dolu,boş..)kontrol eder
     // ID vererek o hücreyi (Node) getiren fonksiyon
     Node* GetNode(int id);
 //bu da ıd ile degıl konumla buluyo
@@ -38,7 +38,7 @@ public:
 
     // Algoritma sorduğunda o hücrenin gidebileceği komşu yolları verir
     LinkedList* GetNeighbors(int id);
-    //linkedlist bambaşta bomboş graph eklıyo ıd numarası ıle
+    //linkedlist başta bomboş graph eklıyo ıd numarası ıle
     //bu komsuları o buyuk harıtada sag sol ust alt bakarak arıyo
     /*djıkstra da o harıtadakı karoları goremıyo dıye adım atabılecegını lınked lıste yazıyo
      *ordan djısktra anlıyo yanı tamam bu ekledıgı duvar degıl sen bu ıd lı karoya adım atabılırsın yol cızdım

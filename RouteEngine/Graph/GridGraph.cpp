@@ -21,10 +21,10 @@ GridGraph::GridGraph(int _width, int _height) {
             
             // Fabrikadan yeni bir Node çıkarıyoruz ve dizimize ekliyoruz.
             nodes[currentId] = new Node(currentId, x, y);
-            /*yanı koca bo yer actık sonra o yerın ıcıne
+            /*yanı koca boş yer actık sonra o yerın ıcıne
              *tek tek asıl adresler ve ıdlerle doldurduk ondan ıkı tane new yer acma var
              */
-            
+
             currentId++; // ID'yi bir sonraki kare için artırıyoruz (0, 1, 2... 2499)
         }
     }
@@ -43,7 +43,7 @@ Node* GridGraph::GetNode(int id) {
     }
     return nullptr; // Eğer hatalı bir ID ise "Boş/Yok" (null) döndür
 }
-
+//yıkıcı metot
 GridGraph::~GridGraph() {//Ana haritanın her seyini temizliyoruz ramdan
     int toplamKare = width * height;
 
@@ -65,19 +65,22 @@ Node* GridGraph::GetNode(int x, int y) {
     // Güvenlik: X ve Y haritanın dışına taşıyor mu?
     if (x >= 0 && x < width && y >= 0 && y < height) {
         
-        // 2 Boyutlu koordinatı (X,Y) 1 Boyutlu dizi ID'sine çevirme formülü!
+        // 2 Boyutlu koordinatı (X,Y) 1 Boyutlu dizi ID'sine çevirme formülü
+        // x->sutun ,y-> satır ,width-> genişlik(sutun sayisi)
         int id = (y * width) + x; 
         
         return nodes[id];
     }
-    return nullptr;
+    return nullptr; //Bilgisayarı çökertmek yerine boş/yok döndürür.
 }
 
 
 LinkedList* GridGraph::GetNeighbors(int id) {//gidebilecegım adreslerı ver
     // Güvenlik kontrolü: ID harita sınırları içinde mi?
     if (id >= 0 && id < (width * height)) {
-        return &adjacencyList[id]; // O ID'nin komşuluk listesinin ADRESİNİ gönder
+        return &adjacencyList[id]; // O ID'nin komşuluk listesinin ADRESİNİ gönder.
+
+            // & kullanarak kopyasını değil,kendisininkomşu listesini veriyor.
     }
     return nullptr;
 }
@@ -122,19 +125,20 @@ void GridGraph::BuildConnections() {//komsu yolları cızen komsu defterı cıka
     }
 }
 //  HÜCREYİ DUVAR YAPMA VEYA DUVARI YIKMA
+//Toogle tersini döndürür
 void GridGraph::ToggleObstacle(int id) {
-    Node* hedefKare = GetNode(id);
+    Node* hedefKare = GetNode(id);  //id ile o kareyi seciyoruz
 
     // Eğer kare gerçekten varsa (null değilse)
     if (hedefKare != nullptr) {
-        // Şu anki durumu al (Duvar mı değil mi?)
+        // Şu anki durumu al (Duvar mı değil mi ona göre tersi durumuna ceviricez
         bool suAnkiDurum = hedefKare->GetIsObstacle();
 
-        // Tam tersine çevir (Du varsa yol yap, yolsa duvar yap)
+        // Tam tersine çevir (Duvar varsa yol yap, yolsa duvar yap)
         hedefKare->SetIsObstacle(!suAnkiDurum);
 
         BuildConnections();
-        //duvar yıkıp ya da yaparsam yollar eskisi gıbı kalmasın guncellensın diye
+        //yollar eskisi gibi kalmasın(komşuluk listeleri guncellenmeli) diye yeniden harita kurulmalı
 
     }
 }
