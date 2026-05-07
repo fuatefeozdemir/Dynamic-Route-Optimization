@@ -17,7 +17,9 @@ add_library(RouteEngine SHARED ${SOURCE_FILES}
         Core/Timer.cpp
         Core/Timer.h
         PriorityQueues/ArrayQueue.cpp
-        PriorityQueues/ArrayQueue.h)
+        PriorityQueues/ArrayQueue.h
+        Collections/Stack.cpp
+        Collections/Stack.h)
 
 set_target_properties(RouteEngine PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build_dll"
