@@ -19,7 +19,9 @@ add_library(RouteEngine SHARED ${SOURCE_FILES}
         PriorityQueues/ArrayQueue.cpp
         PriorityQueues/ArrayQueue.h
         Collections/Stack.cpp
-        Collections/Stack.h)
+        Collections/Stack.h
+        PriorityQueues/BSTQueue.cpp
+        PriorityQueues/BSTQueue.h)
 
 set_target_properties(RouteEngine PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build_dll"
