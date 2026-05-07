@@ -32,7 +32,7 @@ bool Node::GetIsObstacle() {
     return isObstacle;
 }
 
-float Node::GetDistance() {
+int Node::GetDistance() {
     return distance;
 }
 

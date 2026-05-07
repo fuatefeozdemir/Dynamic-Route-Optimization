@@ -4,9 +4,9 @@ LinkedList::LinkedList() {
     head = nullptr;
 }
 void LinkedList::Clear() {
-    Edge* current = head;
+    ListNode* current = head;
     while (current != nullptr) {
-        Edge* next = current->next;
+        ListNode* next = current->Next;
         delete current;
         current = next;
     }
@@ -30,12 +30,12 @@ void LinkedList::AddEdge(int targetId, int weight) {
     ListNode* newNode = new ListNode();
 
     //Halkanın içine komşu bilgilerini yazıyoruz.
-    newNode->id = targetId;
-    newNode->weight = weight;
+    newNode->TargetNodeId = targetId;
+    newNode->Weight = weight;
 
     //Yeni halkayı listenin en başına bağlıyoruz.
     // Yeni halkanın 'next'i, şu an listenin başında ne varsa orayı göstersin.
-    newNode->next = head;
+    newNode->Next = head;
 
     head = newNode;
 }
