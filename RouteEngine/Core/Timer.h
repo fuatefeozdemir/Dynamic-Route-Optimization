@@ -11,5 +11,5 @@ public:
     Timer();
     void Start();
     void Stop();
-    long long GetMicroseconds() const;
+    long long GetMicroseconds();
 };

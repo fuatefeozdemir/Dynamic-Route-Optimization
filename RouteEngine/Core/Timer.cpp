@@ -1,17 +1,18 @@
 #include "Timer.h"
 
+// Kurucu Metot
 Timer::Timer() {
-    isRunning = false;
+    isRunning = false; // Başlangıçta çalışma durumu false
 }
 
-// Kronometreyi başlat
+// Kronometreyi başlatır
 void Timer::Start() {
-    // İşlemcinin o anki tam vaktini al
+    // İşlemcinin o anki vaktini al
     startTime = std::chrono::high_resolution_clock::now();
     isRunning = true;
 }
 
-// Kronometreyi durdur
+// Eğer çalışıyorsa kronometreyi durdurur
 void Timer::Stop() {
     if (isRunning) {
         endTime = std::chrono::high_resolution_clock::now();
@@ -19,12 +20,22 @@ void Timer::Stop() {
     }
 }
 
-// Aradaki farkı hesapla ve mikrosaniye olarak ver
-long long Timer::GetMicroseconds() const {
-    // Eğer kronometre durmamışsa hata verme, şu anki zamana göre farkı al
-    auto end = isRunning ? std::chrono::high_resolution_clock::now() : endTime;
-    
-    // Süreyi mikrosaniyeye çevir (1 saniye = 1.000.000 mikrosaniye)
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - startTime);
-    return duration.count();
+// Aradaki farkı hesaplar ve mikrosaniye olarak verir
+long long Timer::GetMicroseconds() {
+    // 1. Durum: Kronometre hala çalışıyorsa
+    if (isRunning) {
+        // Şu anki canlı zamanı bitiş zamanı olarak al
+        std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
+        // Süreyi mikrosaniyeye çevir
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - startTime);
+        return duration.count();
+    }
+    // 2. Durum: Kronometre durdurulmuşsa
+    else {
+        // Durdurulduğundaki kaydedilen bitiş zamanını kullan
+        std::chrono::time_point<std::chrono::high_resolution_clock> end = endTime;
+        // Süreyi mikrosaniyeye çevir
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - startTime);
+        return duration.count();
+    }
 }
