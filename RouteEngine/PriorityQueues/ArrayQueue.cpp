@@ -1,6 +1,6 @@
 #include "ArrayQueue.h"
 
-// Kurucu Metot
+// Constructor
 ArrayQueue::ArrayQueue(int maxCapacity) {
     capacity = maxCapacity;
     currentSize = 0;

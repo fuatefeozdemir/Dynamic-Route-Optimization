@@ -1,6 +1,6 @@
 #include "Timer.h"
 
-// Kurucu Metot
+// Constructor
 Timer::Timer() {
     isRunning = false; // Başlangıçta çalışma durumu false
 }

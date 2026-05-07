@@ -16,7 +16,7 @@ en son da sırası gelene kadar beklemesi için Queue'nun içine data olarak at�
     int data;//bu da yine linkedlist TargetNodeId ve Node id nin aynisi
     QueueNode* next;
 
-    // Kurucu metot (Yeni bir yapı oluşturulduğunda çağrılır)
+    // Constructor
     QueueNode(int val) : data(val), next(nullptr) {}//hızlı yazımı
 };
 

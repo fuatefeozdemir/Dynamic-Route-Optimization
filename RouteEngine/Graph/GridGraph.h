@@ -4,8 +4,7 @@
 
 class GridGraph {
 private:
-    //HARİTANIN FİZİKSEL ÖZELLİKLERİ
-    int width;   //Kaç satır //harita boyutları
+    int width;   //Kaç satır
     int height;  //kaç sütun
 
     //HAFIZA (RAM) YÖNETİMİ
@@ -15,7 +14,7 @@ private:
     //Hücrelerin birbirleriyle olan geçerli hareket yolları komşular.
 public:
 
-    //Kurucu Metot: Haritayı genişlik ve yüksekliğe göre inşa eder
+    // Constructor
     GridGraph(int _width, int _height);
 
 //LinkedList teki idlere gore kutunun ozelliklerini(dolu,boş..)kontrol eder
@@ -27,8 +26,6 @@ public:
 
     //Arayüzden tıklanan hücreyi Duvar/Yol yapan fonksiyon
     void ToggleObstacle(int id);
-
-
 
     // Yıkıcı Metot: Program kapanırken RAM'i temizler
     ~GridGraph();//memory leak onler

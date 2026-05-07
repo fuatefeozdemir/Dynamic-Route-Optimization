@@ -3,30 +3,25 @@
 
 class Node {
 private:
-    //Sadece bu sınıfın içinden erişilebilir
-    int id;                 // Karenin no'su
-    //bu id linkedlist deki TargetNodeId nin ta kendisi
+    int id;                 // Karenin no'su (Bu id, LinkedList'teki TargetNodeId'dir)
     Point coordinate;       // Karenin X ve Y koordinatı
-    bool isObstacle;        // Bu kare bir duvar/engel mi?
-    int distance;         // Dijkstra'nın buraya gelme maliyeti //dıstance o yoldakı weıghtlerın toplamı
+    bool isObstacle;        // Bu kare bir engel mi?
+    int distance;           // Dijkstra'nın başlangıçtan buraya gelme maliyeti (distance, o yoldaki weight'lerin toplamıdır)
     int previousNodeId;     // Rotayı bulduktan sonra geriye doğru çizmek için bir önceki adımın ID'si
 
 public:
-    // public fonksiyonlar (API)(uygulama programlama arayüzü)
-
-    //Constructor
+    // Constructor
     Node(int _id, int _x, int _y);
 
-    //Okuma (Getter) Fonksiyonları
+    // Getter Metotlar
     int GetId();
     Point GetCoordinate();
     bool GetIsObstacle();
     int GetDistance();
     int GetPreviousNodeId();
 
-    // Değiştirme (Setter) Fonksiyonları
+    // Setter Metotlar
     void SetIsObstacle(bool status);
-    void SetDistance(float _distance);
+    void SetDistance(int _distance);
     void SetPreviousNodeId(int _prevId);
-    //setId ve setCoordinate fonskiyonu yazmadık çünkü o karenin id si ve koordinatı akış boyunca değiştirilmemesi gerek.
 };

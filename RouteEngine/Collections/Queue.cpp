@@ -6,8 +6,7 @@
 //butun yapıyı atlaya altaya bosuna dolasmak yerıne en yakındakılerden emın olarak ılerler
 #include "Queue.h"
 
-// Kurucu Metot (Başlangıçta front ve rear null)
-//ilk acilista kimse yok
+// Constructor (Başlangıçta front ve rear null)
 Queue::Queue() {
     front = nullptr;
     rear = nullptr;

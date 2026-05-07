@@ -1,11 +1,11 @@
 #include "Stack.h"
 
-// Başlangıçta yığın boştur
+// Constructor
 Stack::Stack() {
-    top = nullptr;
+    top = nullptr; // Başlangıçta boştur
 }
 
-// Sınıf silinirken içeride kalan düğümleri temizle
+// Yıkıcı Metot
 Stack::~Stack() {
     Clear();
 }

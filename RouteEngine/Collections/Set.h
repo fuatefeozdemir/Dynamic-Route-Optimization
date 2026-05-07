@@ -10,7 +10,6 @@
 class Set {
 private:
     bool* items;
-    //dinamik dizi *
     int capacity;
 
 public:
@@ -21,5 +20,3 @@ public:
     bool Contains(int id) const;
     void Clear();
 };
-
-#endif //ROUTEENGINE_SET_H//okuma bitti buraya kadar
