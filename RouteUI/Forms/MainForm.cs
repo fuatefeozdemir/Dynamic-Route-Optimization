@@ -12,111 +12,172 @@ namespace RouteUI
     {
         private RouteManager _routeManager;
         private GridState _gridState;
+        private Stack<UserAction> _undoStack = new Stack<UserAction>();
 
-        private const int GridWidth = 40;
-        private const int GridHeight = 25;
-        private const int CellSize = 25;
+        private bool _isSelectingStart = false;
+        private bool _isSelectingEnd = false;
 
         public MainForm()
         {
             InitializeComponent();
-
-            // Titremeyi önlemek için
-            this.DoubleBuffered = true;
-
-            // Altyapıyı kur
-            _routeManager = new RouteManager(GridWidth, GridHeight);
-            _gridState = new GridState(GridWidth, GridHeight, CellSize);
-
-            // Form boyutunu ızgaraya göre ayarla
-            this.ClientSize = new Size(GridWidth * CellSize, GridHeight * CellSize + 50); // +50 butonlar için
+            UpdateStatus("Lütfen harita boyutlarını girip 'Harita Oluştur'a basın.");
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        private void btnCreateMap_Click(object sender, EventArgs e)
         {
-            base.OnPaint(e);
-            // Tüm ızgarayı ve hücre durumlarını çiz
-            GridRenderer.Draw(e.Graphics, _gridState);
+            int w = (int)numWidth.Value;
+            int h = (int)numHeight.Value;
+            int cellSize = 25;
+
+            _routeManager?.Dispose();
+            _routeManager = new RouteManager(w, h);
+            _gridState = new GridState(w, h, cellSize);
+            _undoStack.Clear();
+            dgvResults.Rows.Clear();
+
+            _isSelectingStart = true;
+            _isSelectingEnd = false;
+
+            UpdateStatus("Harita oluşturuldu. Lütfen BAŞLANGIÇ noktasını seçin (Yeşil).");
+            picGrid.Invalidate(); // Sadece çizim alanını yenile
         }
 
-        protected override void OnMouseDown(MouseEventArgs e)
+        private void picGrid_Paint(object sender, PaintEventArgs e)
         {
-            base.OnMouseDown(e);
+            if (_gridState != null)
+            {
+                // Çizim artık temiz bir tuvalde (PictureBox) yapılıyor
+                GridRenderer.Draw(e.Graphics, _gridState);
+            }
+        }
+
+        private void picGrid_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (_gridState == null) return;
 
             var targetNode = _gridState.GetNodeAt(e.Location);
             if (targetNode == null) return;
 
-            // CTRL basılıysa Başlangıç ata
-            if (ModifierKeys == Keys.Control)
+            if (_isSelectingStart)
             {
                 _gridState.SetStartNode(targetNode);
+                _undoStack.Push(new UserAction(ActionType.SetStart, targetNode));
+                _isSelectingStart = false;
+                _isSelectingEnd = true;
+                UpdateStatus("Başlangıç seçildi. Lütfen BİTİŞ noktasını seçin (Mavi).");
             }
-            // SHIFT basılıysa Bitiş ata
-            else if (ModifierKeys == Keys.Shift)
+            else if (_isSelectingEnd)
             {
+                if (targetNode.State == CellState.Start) return;
                 _gridState.SetEndNode(targetNode);
+                _undoStack.Push(new UserAction(ActionType.SetEnd, targetNode));
+                _isSelectingEnd = false;
+                UpdateStatus("Noktalar hazır. 'Rastgele Engel' ekleyebilir veya 'Rotayı Bul'a basabilirsiniz.");
             }
-            // Sadece tıklama ise Engel koy/kaldır
-            else
-            {
-                _routeManager.ToggleObstacle(targetNode.Id);
+            // Manuel engel ekleme tamamen kaldırıldı.
 
-                // C# tarafındaki görsel durumu güncelle
-                targetNode.State = (targetNode.State == CellState.Obstacle)
-                    ? CellState.Empty
-                    : CellState.Obstacle;
-            }
-
-            this.Invalidate(); // Ekranı yenile
+            picGrid.Invalidate();
         }
 
-        // "Yolu Bul" Butonuna tıklandığında (butona bağlanacak)
-        private void btnFindPath_Click(object sender, EventArgs e)
+        private void btnRandomObstacles_Click(object sender, EventArgs e)
         {
-            if (_gridState.StartNode == null || _gridState.EndNode == null)
+            if (_gridState == null || _isSelectingStart || _isSelectingEnd) return;
+
+            Random rnd = new Random();
+            List<NodeModel> addedObstacles = new List<NodeModel>();
+
+            foreach (var node in _gridState.Nodes)
             {
-                MessageBox.Show("Lütfen başlangıç ve bitiş noktalarını seçin!");
+                // Başlangıç, bitiş veya mevcut engel değilse %20 ihtimalle engel koy
+                if (node.State == CellState.Empty && rnd.Next(100) < 20)
+                {
+                    node.State = CellState.Obstacle;
+                    _routeManager.ToggleObstacle(node.Id);
+                    addedObstacles.Add(node);
+                }
+            }
+
+            if (addedObstacles.Count > 0)
+            {
+                _undoStack.Push(new UserAction(ActionType.AddRandomObstacles, addedObstacles));
+                UpdateStatus($"{addedObstacles.Count} rastgele engel eklendi.");
+                picGrid.Invalidate();
+            }
+        }
+
+        private void btnUndo_Click(object sender, EventArgs e)
+        {
+            if (_undoStack.Count == 0) return;
+
+            var lastAction = _undoStack.Pop();
+            switch (lastAction.Type)
+            {
+                case ActionType.SetStart:
+                    lastAction.Node.State = CellState.Empty;
+                    _isSelectingStart = true;
+                    _isSelectingEnd = false;
+                    UpdateStatus("Başlangıç seçimi geri alındı.");
+                    break;
+                case ActionType.SetEnd:
+                    lastAction.Node.State = CellState.Empty;
+                    _isSelectingEnd = true;
+                    UpdateStatus("Bitiş seçimi geri alındı.");
+                    break;
+                case ActionType.AddRandomObstacles:
+                    foreach (var n in lastAction.Nodes)
+                    {
+                        n.State = CellState.Empty;
+                        _routeManager.ToggleObstacle(n.Id);
+                    }
+                    UpdateStatus("Son eklenen rastgele engeller kaldırıldı.");
+                    break;
+            }
+            picGrid.Invalidate();
+        }
+
+        private void btnRunTest_Click(object sender, EventArgs e)
+        {
+            if (_gridState?.StartNode == null || _gridState?.EndNode == null)
+            {
+                MessageBox.Show("Testi başlatmak için başlangıç ve bitiş noktalarını seçmelisiniz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // 1. Önceki yolu temizle
-            _gridState.ClearPath();
-
-            // 2. C++ tarafındaki komşulukları güncelle
+            dgvResults.Rows.Clear();
             _routeManager.BuildConnections();
 
-            // 3. Yolu hesapla (Örn: MinHeap [2] kullanarak)
-            Metrics metrics;
-            var pathIds = _routeManager.FindPath(
-                _gridState.StartNode.Id,
-                _gridState.EndNode.Id,
-                2, // MinHeap
-                out metrics);
-
-            if (pathIds.Count > 0)
+            // Sırasıyla 3 senaryoyu tamamen sıfırdan koştur
+            for (int i = 0; i < 3; i++)
             {
-                // 4. Gelen ID'leri görsel olarak işaretle
-                foreach (int id in pathIds)
+                _gridState.ClearPath(); // C# tarafında görsel rotayı temizle
+
+                Metrics metrics;
+                var path = _routeManager.FindPath(_gridState.StartNode.Id, _gridState.EndNode.Id, i, out metrics);
+
+                string queueName = i switch { 0 => "Dizi (Array)", 1 => "BST", 2 => "Min-Heap", _ => "Bilinmeyen" };
+
+                dgvResults.Rows.Add(queueName, $"{metrics.TimeMicroseconds} μs", metrics.NodesExamined, metrics.RouteFound ? "Başarılı" : "Başarısız");
+
+                // Sadece son algoritmanın (Min-Heap) bulduğu yolu ekrana çizdir
+                if (i == 2 && path.Count > 0)
                 {
-                    var node = _gridState.GetNodeById(id);
-                    if (node != null && node.State == CellState.Empty)
+                    foreach (var id in path)
                     {
-                        node.State = CellState.Path;
+                        var n = _gridState.GetNodeById(id);
+                        if (n != null && n.State == CellState.Empty)
+                        {
+                            n.State = CellState.Path;
+                        }
                     }
                 }
-
-                // İstatistikleri göster
-                Console.WriteLine($"Süre: {metrics.TimeMicroseconds} us, İncelenen Node: {metrics.NodesExamined}");
-            }
-            else
-            {
-                MessageBox.Show("Yol bulunamadı!");
             }
 
-            this.Invalidate(); // Sonucu çizdir
+            UpdateStatus("Performans testi tamamlandı.");
+            picGrid.Invalidate();
         }
 
-        // Bellek sızıntısını önlemek için C++ nesnesini yok et
+        private void UpdateStatus(string text) => lblStatus.Text = "Durum: " + text;
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);

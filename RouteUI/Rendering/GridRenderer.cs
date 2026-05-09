@@ -9,8 +9,8 @@ namespace RouteUI.Rendering
         private static readonly Brush EmptyBrush = Brushes.White;
         private static readonly Brush ObstacleBrush = new SolidBrush(Color.FromArgb(45, 45, 45));
         private static readonly Brush StartBrush = Brushes.LimeGreen;
-        private static readonly Brush EndBrush = Brushes.Crimson;
-        private static readonly Brush PathBrush = Brushes.Gold;
+        private static readonly Brush EndBrush = Brushes.DodgerBlue; // Bitiş noktası mavi             
+        private static readonly Brush PathBrush = Brushes.Crimson;   // Bulunan rota kırmızı hat            
 
         private static readonly Pen GridPen = new Pen(Color.FromArgb(230, 230, 230), 1);
 
