@@ -25,5 +25,8 @@ namespace RouteUI.Interop
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void DeletePath(IntPtr path);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void DeleteVisitedNodes(IntPtr visitedNodes);
     }
 }

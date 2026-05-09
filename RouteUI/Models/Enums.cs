@@ -13,7 +13,8 @@ namespace RouteUI.Models
         Obstacle = 1,
         Start = 2,
         End = 3,
-        Path = 4
+        Path = 4,
+        Visited = 5
     }
 
     public enum ActionType

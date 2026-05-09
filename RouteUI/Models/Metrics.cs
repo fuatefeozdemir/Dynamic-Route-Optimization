@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 
 namespace RouteUI.Models
@@ -11,5 +12,8 @@ namespace RouteUI.Models
 
         [MarshalAs(UnmanagedType.U1)]
         public bool RouteFound;
+
+        public IntPtr VisitedNodes;
+        public int VisitedCount;
     }
 }

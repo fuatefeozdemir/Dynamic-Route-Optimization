@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using RouteUI.Logic;
 using RouteUI.Models;
@@ -39,14 +40,13 @@ namespace RouteUI
             _isSelectingEnd = false;
 
             UpdateStatus("Harita oluşturuldu. Lütfen BAŞLANGIÇ noktasını seçin (Yeşil).");
-            picGrid.Invalidate(); // Sadece çizim alanını yenile
+            picGrid.Invalidate();
         }
 
         private void picGrid_Paint(object sender, PaintEventArgs e)
         {
             if (_gridState != null)
             {
-                // Çizim artık temiz bir tuvalde (PictureBox) yapılıyor
                 GridRenderer.Draw(e.Graphics, _gridState);
             }
         }
@@ -74,7 +74,6 @@ namespace RouteUI
                 _isSelectingEnd = false;
                 UpdateStatus("Noktalar hazır. 'Rastgele Engel' ekleyebilir veya 'Rotayı Bul'a basabilirsiniz.");
             }
-            // Manuel engel ekleme tamamen kaldırıldı.
 
             picGrid.Invalidate();
         }
@@ -88,7 +87,6 @@ namespace RouteUI
 
             foreach (var node in _gridState.Nodes)
             {
-                // Başlangıç, bitiş veya mevcut engel değilse %20 ihtimalle engel koy
                 if (node.State == CellState.Empty && rnd.Next(100) < 20)
                 {
                     node.State = CellState.Obstacle;
@@ -135,45 +133,94 @@ namespace RouteUI
             picGrid.Invalidate();
         }
 
-        private void btnRunTest_Click(object sender, EventArgs e)
+        private async void btnRunTest_Click(object sender, EventArgs e)
         {
             if (_gridState?.StartNode == null || _gridState?.EndNode == null)
             {
-                MessageBox.Show("Testi başlatmak için başlangıç ve bitiş noktalarını seçmelisiniz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Başlangıç ve bitiş seçmelisiniz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
+            // Arayüz hazırlığı
+            btnRunTest.Enabled = false;
             dgvResults.Rows.Clear();
             _routeManager.BuildConnections();
 
-            // Sırasıyla 3 senaryoyu tamamen sıfırdan koştur
+            // C# tarafındaki isimlendirme sırası
+            string[] queueNames = { "Dizi (Array)", "BST", "Min-Heap" };
+
+            // KRİTİK NOKTA: C++ tarafındaki switch-case yapısına uygun ID eşleştirmesi
+            // C++'ta: 1=Array, 2=MinHeap, 3=BST olarak kodlanmış.
+            int[] cppQueueIds = { 1, 3, 2 };
+
             for (int i = 0; i < 3; i++)
             {
-                _gridState.ClearPath(); // C# tarafında görsel rotayı temizle
+                UpdateStatus($"{queueNames[i]} kullanılarak rota aranıyor...");
 
-                Metrics metrics;
-                var path = _routeManager.FindPath(_gridState.StartNode.Id, _gridState.EndNode.Id, i, out metrics);
-
-                string queueName = i switch { 0 => "Dizi (Array)", 1 => "BST", 2 => "Min-Heap", _ => "Bilinmeyen" };
-
-                dgvResults.Rows.Add(queueName, $"{metrics.TimeMicroseconds} μs", metrics.NodesExamined, metrics.RouteFound ? "Başarılı" : "Başarısız");
-
-                // Sadece son algoritmanın (Min-Heap) bulduğu yolu ekrana çizdir
-                if (i == 2 && path.Count > 0)
+                // 1. Haritayı temizle (Önceki algoritmanın izlerini sil)
+                foreach (var node in _gridState.Nodes)
                 {
-                    foreach (var id in path)
+                    if (node.State == CellState.Path || node.State == CellState.Visited)
+                    {
+                        node.State = CellState.Empty;
+                    }
+                }
+                picGrid.Invalidate();
+
+                // Temizliği kullanıcının fark etmesi için kısa bir bekleme
+                await Task.Delay(500);
+
+                // 2. Algoritmayı çalıştır (cppQueueIds[i] ile doğru ID'yi gönderiyoruz)
+                Metrics metrics;
+                var result = _routeManager.FindPath(_gridState.StartNode.Id, _gridState.EndNode.Id, cppQueueIds[i], out metrics);
+
+                // 3. Su dalgası animasyonu (Arama süreci)
+                foreach (var id in result.Visited)
+                {
+                    var n = _gridState.GetNodeById(id);
+                    if (n != null && n.State == CellState.Empty)
+                    {
+                        n.State = CellState.Visited;
+                        picGrid.Invalidate(n.Bounds);
+                        // Harita çok büyükse hızı artırmak için delay'i düşürebilirsin
+                        await Task.Delay(2);
+                    }
+                }
+
+                await Task.Delay(150); // Rota çizilmeden önce çok kısa bekle
+
+                // 4. Bitiş yolu (Kırmızı Hat) çizimi
+                if (result.Path.Count > 0)
+                {
+                    foreach (var id in result.Path)
                     {
                         var n = _gridState.GetNodeById(id);
-                        if (n != null && n.State == CellState.Empty)
+                        if (n != null && (n.State == CellState.Visited || n.State == CellState.Empty))
                         {
                             n.State = CellState.Path;
                         }
                     }
+                    picGrid.Invalidate();
+                }
+
+                // 5. Verileri tabloya ekle
+                dgvResults.Rows.Add(
+                    queueNames[i],
+                    $"{metrics.TimeMicroseconds} μs",
+                    metrics.NodesExamined,
+                    metrics.RouteFound ? "Başarılı" : "Başarısız"
+                );
+
+                // 6. Bir sonraki algoritma başlamadan önce sonucu görmemiz için bekle
+                if (i < 2)
+                {
+                    UpdateStatus($"{queueNames[i]} bitti. Sonraki bekleniyor...");
+                    await Task.Delay(2000);
                 }
             }
 
-            UpdateStatus("Performans testi tamamlandı.");
-            picGrid.Invalidate();
+            UpdateStatus("Tüm performans testleri başarıyla tamamlandı.");
+            btnRunTest.Enabled = true;
         }
 
         private void UpdateStatus(string text) => lblStatus.Text = "Durum: " + text;
