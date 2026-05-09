@@ -6,21 +6,21 @@ extern "C" {
         return new GridGraph(width, height);
     }
 
-    // Bellek temizliği: C++ tarafında 'new' ile oluşturulan nesne burada silinir
+    // Bellek temizliği
     __declspec(dllexport) void DeleteGraph(GridGraph* graph) {
         if (graph != nullptr) {
             delete graph;
         }
     }
 
-    // GridGraph üzerindeki ToggleObstacle metoduna yönlendirme yapar
+    // Engel geçişi
     __declspec(dllexport) void ToggleObstacle(GridGraph* graph, int id) {
         if (graph != nullptr) {
             graph->ToggleObstacle(id);
         }
     }
 
-    // Dijkstra çalışmadan önce komşuluk listesini hazırlar
+    // Komşulukları hazırla
     __declspec(dllexport) void BuildConnections(GridGraph* graph) {
         if (graph != nullptr) {
             graph->BuildConnections();
@@ -32,16 +32,20 @@ extern "C" {
         if (graph == nullptr || outMetrics == nullptr) {
             return nullptr;
         }
-
-        // Algoritma çalışır, içindeki metrics struct'ını doldurur
-        // ve rota ID dizisinin pointer'ını döndürür.
         return DijkstraSolver::Solve(graph, startId, endId, queueType, *outMetrics);
     }
 
-    // C#'ın silemediği C++ dizisi burada silinir
+    // C#'ın silemediği Rota dizisini temizler
     __declspec(dllexport) void DeletePath(int* path) {
         if (path != nullptr) {
             delete[] path;
+        }
+    }
+
+    // C#'ın silemediği Animasyon (Visited) dizisini temizler
+    __declspec(dllexport) void DeleteVisitedNodes(int* visitedNodes) {
+        if (visitedNodes != nullptr) {
+            delete[] visitedNodes;
         }
     }
 }
