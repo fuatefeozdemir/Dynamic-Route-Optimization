@@ -1,10 +1,6 @@
 //
 // Created by Efe on 5.05.2026.
 //
-
-#ifndef ROUTEENGINE_SET_H
-#define ROUTEENGINE_SET_H
-
 #pragma once
 
 class Set {
