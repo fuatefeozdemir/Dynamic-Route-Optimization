@@ -10,7 +10,9 @@ file(GLOB_RECURSE SOURCE_FILES
 )
 
 # Sadece otomatik toplanan SOURCE_FILES değişkenini kullanarak DLL oluşturur
-add_library(RouteEngine SHARED ${SOURCE_FILES})
+add_library(RouteEngine SHARED ${SOURCE_FILES}
+        Algorithms/DijkstraSolver.cpp
+        Algorithms/DijkstraSolver.h)
 
 # Üretilen DLL dosyasını karmaşa yaratmaması için build_dll klasörüne atar
 set_target_properties(RouteEngine PROPERTIES
