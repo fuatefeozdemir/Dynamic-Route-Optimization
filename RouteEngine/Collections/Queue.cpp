@@ -27,7 +27,7 @@ void Queue::Enqueue(int id) {
         return;
     }
 
-    // Eğer kuyruk boşsa kuyruğun sonuna eklenir ve eklenen düğüm kuyruk olur
+    // Eğer kuyrukta bekleyenler varsa kuyruğun sonuna eklenir ve eklenen düğüm rear olur
     rear->next = newNode;
     rear = newNode;
 }
@@ -40,8 +40,8 @@ int Queue::Dequeue() {
         return -1;
     }
 
-    QueueNode* temp = front;
-    int id = temp->data;
+    QueueNode* temp = front;    //çıkarılacak elemanı temp'te tut
+    int id = temp->data;    //temp'in id sini al.
 
     front = front->next;
 
@@ -62,7 +62,7 @@ bool Queue::IsEmpty() const {
 
 // Kuyruğu temizle
 void Queue::Clear() {
-    while (!IsEmpty()) {
+    while (!IsEmpty()) {//kuyruk boşalana kadar hepsini çıkar.
         Dequeue();
     }
 }
