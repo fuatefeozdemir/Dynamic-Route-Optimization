@@ -4,6 +4,7 @@
 #include "../Collections/PriorityQueues/MinHeap.h"
 #include "../Collections/PriorityQueues/BSTQueue.h"
 #include "../Collections/Stack.h"
+#include "../Collections/Queue.h"
 
 const int INFINITY_DIST = 999999;
 
@@ -28,6 +29,10 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
     timer.Start();
     int nodesExamined = 0;
     outMetrics.routeFound = false;
+    outMetrics.visitedNodes = nullptr; // YENİ: Başlangıçta boş
+    outMetrics.visitedCount = 0;       // YENİ: Başlangıçta 0
+
+    Queue animationQueue;
 
     // 2. ADIM: KUYRUK SEÇİMİ
     ArrayQueue* arrayQueue = nullptr;
@@ -63,6 +68,8 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
 
         if (currentId == -1) break;
 
+        animationQueue.Enqueue(currentId);
+
         // Hedefe ulaştık mı?
         if (currentId == endId) {
             outMetrics.routeFound = true;
@@ -83,7 +90,7 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
 
             Node* neighbor = graph->GetNode(neighborId);
 
-            // Engel kontrolü: Eğer hücre duvarsa oraya gidemeyiz
+            // Engel kontrolü
             if (neighbor->GetIsObstacle()) {
                 neighborNode = neighborNode->Next;
                 continue;
@@ -91,12 +98,11 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
 
             int newDist = currentDist + (int)weight;
 
-            // Gevşetme (Relaxation) işlemi
+            // Gevşetme (Relaxation)
             if (newDist < neighbor->GetDistance()) {
                 neighbor->SetDistance(newDist);
                 neighbor->SetPreviousNodeId(currentId);
 
-                // Kuyrukları güncelle veya ekle
                 if (queueType == 1) {
                     arrayQueue->Insert(neighborId, newDist);
                 } else if (queueType == 2) {
@@ -112,6 +118,15 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
     timer.Stop();
     outMetrics.timeMicroseconds = timer.GetMicroseconds();
     outMetrics.nodesExamined = nodesExamined;
+
+    // Animasyon verisini C#'a göndermek için Metrics dizisine aktarıyoruz
+    outMetrics.visitedCount = nodesExamined + (outMetrics.routeFound ? 1 : 0);
+    if (outMetrics.visitedCount > 0) {
+        outMetrics.visitedNodes = new int[outMetrics.visitedCount];
+        for (int i = 0; i < outMetrics.visitedCount; i++) {
+            outMetrics.visitedNodes[i] = animationQueue.Dequeue();
+        }
+    }
 
     // 5. ADIM: BELLEK TEMİZLİĞİ VE ROTA OLUŞTURMA
     if (!outMetrics.routeFound) {
@@ -130,7 +145,6 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
         stepId = graph->GetNode(stepId)->GetPreviousNodeId();
     }
 
-    // Adım sayısını hesapla (Stack'i bozmadan saymak için geçici stack kullanıyoruz)
     int count = 0;
     Stack tempStack;
     while (!pathStack.IsEmpty()) {
@@ -139,13 +153,11 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
     }
     outMetrics.pathLength = count;
 
-    // C#'a dönecek olan final dizi
     int* finalPath = new int[count];
     for (int i = 0; i < count; i++) {
         finalPath[i] = tempStack.Pop();
     }
 
-    // Temizlik
     if (arrayQueue) delete arrayQueue;
     if (minHeap) delete minHeap;
     if (bstQueue) delete bstQueue;
