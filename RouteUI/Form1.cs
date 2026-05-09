@@ -19,12 +19,11 @@ namespace RouteUI
 
             try
             {
-                // 1. TEST: C++ motorundan 10x10'luk bir harita oluşturmasını istiyoruz
+                // Motoru oluşturmayı dene
                 _nativeGraph = EngineBridge.CreateGraph(10, 10);
 
                 if (_nativeGraph != IntPtr.Zero)
                 {
-                    // Bağlantı başarılıysa mesaj ver
                     MessageBox.Show("C++ Motoru Başarıyla Bağlandı!\nHarita nesnesi oluşturuldu.",
                                     "Bağlantı Testi", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -34,9 +33,21 @@ namespace RouteUI
                                     "Hata", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
+            catch (DllNotFoundException)
+            {
+                // DLL bulunamadığında tam olarak nereye bakıyor?
+                string currentDir = AppDomain.CurrentDomain.BaseDirectory;
+
+                MessageBox.Show($"Hata: DLL dosyası bulunamadı!\n\n" +
+                                $"Aranan Klasör: {currentDir}\n\n" +
+                                $"Aranan Dosya: libRouteEngine.dll\n\n" +
+                                $"Lütfen DLL dosyasını yukarıdaki klasöre kopyalayıp tekrar deneyin.",
+                                "DLL Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             catch (Exception ex)
             {
-                MessageBox.Show($"Beklenmedik bir hata oluştu:\n{ex.Message}",
+                MessageBox.Show($"Beklenmedik bir hata oluştu:\n{ex.Message}\n\n" +
+                                $"Detay: {ex.GetType().Name}",
                                 "Kritik Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
