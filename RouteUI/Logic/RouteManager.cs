@@ -49,7 +49,7 @@ namespace RouteUI.Logic
             // C++ tarafında 'new int[]' ile açılan belleği temizle
             EngineBridge.DeletePath(pathPtr);
 
-            return new List<List<int>.Enumerator>(pathArray).ToList(); // Listeye çevirip dön
+            return new List<int>(pathArray);
         }
 
         // --- IDisposable Uygulaması ---

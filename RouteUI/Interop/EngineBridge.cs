@@ -1,19 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using RouteUI.Models;
 
 namespace RouteUI.Interop
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct Metrics
-    {
-        public long TimeMicroseconds;
-        public int NodesExamined;
-        public int PathLength;
-
-        [MarshalAs(UnmanagedType.U1)]
-        public bool RouteFound;
-    }
-
     public static class EngineBridge
     {
         private const string DllName = "libRouteEngine.dll";
