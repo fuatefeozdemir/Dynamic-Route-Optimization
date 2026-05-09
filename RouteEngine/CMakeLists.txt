@@ -19,3 +19,6 @@ set_target_properties(RouteEngine PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build_dll"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build_dll"
 )
+
+# DLL'in ihtiyaç duyduğu MinGW kütüphanelerini içine gömer
+target_link_options(RouteEngine PRIVATE -static -static-libgcc -static-libstdc++)
