@@ -24,6 +24,8 @@ public:
     // X ve Y koordinatı vererek o hücreyi (Node) getiren fonksiyon
     Node* GetNode(int x, int y);
 
+    int GetTotalNodes();
+
     //Arayüzden tıklanan hücreyi Duvar/Yol yapan fonksiyon
     void ToggleObstacle(int id);
 

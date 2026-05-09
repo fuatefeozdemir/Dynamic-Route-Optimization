@@ -74,6 +74,9 @@ Node* GridGraph::GetNode(int x, int y) {
     return nullptr; //Bilgisayarı çökertmek yerine boş/yok döndürür.
 }
 
+int GridGraph::GetTotalNodes() {
+    return width * height;
+}
 
 LinkedList* GridGraph::GetNeighbors(int id) {//gidebilecegım adreslerı ver
     // Güvenlik kontrolü: ID harita sınırları içinde mi?
