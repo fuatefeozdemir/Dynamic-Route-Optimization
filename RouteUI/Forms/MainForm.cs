@@ -11,8 +11,8 @@ namespace RouteUI
 {
     public partial class MainForm : Form
     {
-        private RouteManager _routeManager;
-        private GridState _gridState;
+        private RouteManager? _routeManager;
+        private GridState? _gridState;
         private Stack<UserAction> _undoStack = new Stack<UserAction>();
 
         private bool _isSelectingStart = false;
@@ -21,25 +21,43 @@ namespace RouteUI
         public MainForm()
         {
             InitializeComponent();
-            UpdateStatus("Lütfen harita boyutlarını girip 'Harita Oluştur'a basın.");
+            SetupDataGridView();
+            UpdateStatus("Harita boyutlarını girip 'Harita Oluştur' butonuna tıklayın.");
+        }
+
+        private void SetupDataGridView()
+        {
+            dgvResults.BackgroundColor = Color.White;
+            dgvResults.BorderStyle = BorderStyle.None;
+            dgvResults.RowTemplate.Height = 40;
+            dgvResults.ColumnHeadersHeight = 45;
+            dgvResults.Font = new Font("Segoe UI", 10F);
+            dgvResults.EnableHeadersVisualStyles = false;
+            dgvResults.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240);
+            dgvResults.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black;
+            dgvResults.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dgvResults.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvResults.MultiSelect = false;
+            dgvResults.Enabled = false; // Kullanıcı tabloya tıklayamasın
         }
 
         private void btnCreateMap_Click(object sender, EventArgs e)
         {
             int w = (int)numWidth.Value;
             int h = (int)numHeight.Value;
-            int cellSize = 25;
 
             _routeManager?.Dispose();
             _routeManager = new RouteManager(w, h);
-            _gridState = new GridState(w, h, cellSize);
+            // picGrid.Size gönderilerek dinamik ölçekleme sağlanıyor
+            _gridState = new GridState(w, h, picGrid.Size);
+
             _undoStack.Clear();
             dgvResults.Rows.Clear();
 
             _isSelectingStart = true;
             _isSelectingEnd = false;
 
-            UpdateStatus("Harita oluşturuldu. Lütfen BAŞLANGIÇ noktasını seçin (Yeşil).");
+            UpdateStatus("Harita ölçeklendi. Önce Başlangıç (Yeşil), sonra Bitiş (Mavi) seçin.");
             picGrid.Invalidate();
         }
 
@@ -56,7 +74,7 @@ namespace RouteUI
             if (_gridState == null) return;
 
             var targetNode = _gridState.GetNodeAt(e.Location);
-            if (targetNode == null) return;
+            if (targetNode == null) return; // Geçersiz bölge kontrolü
 
             if (_isSelectingStart)
             {
@@ -64,7 +82,7 @@ namespace RouteUI
                 _undoStack.Push(new UserAction(ActionType.SetStart, targetNode));
                 _isSelectingStart = false;
                 _isSelectingEnd = true;
-                UpdateStatus("Başlangıç seçildi. Lütfen BİTİŞ noktasını seçin (Mavi).");
+                UpdateStatus("Başlangıç seçildi. Şimdi BİTİŞ noktasını seçin.");
             }
             else if (_isSelectingEnd)
             {
@@ -72,7 +90,7 @@ namespace RouteUI
                 _gridState.SetEndNode(targetNode);
                 _undoStack.Push(new UserAction(ActionType.SetEnd, targetNode));
                 _isSelectingEnd = false;
-                UpdateStatus("Noktalar hazır. 'Rastgele Engel' ekleyebilir veya 'Rotayı Bul'a basabilirsiniz.");
+                UpdateStatus("Noktalar hazır. Engel ekleyebilir veya testi başlatabilirsiniz.");
             }
 
             picGrid.Invalidate();
@@ -80,7 +98,7 @@ namespace RouteUI
 
         private void btnRandomObstacles_Click(object sender, EventArgs e)
         {
-            if (_gridState == null || _isSelectingStart || _isSelectingEnd) return;
+            if (_gridState == null || _isSelectingStart || _isSelectingEnd || _routeManager == null) return;
 
             Random rnd = new Random();
             List<NodeModel> addedObstacles = new List<NodeModel>();
@@ -98,14 +116,14 @@ namespace RouteUI
             if (addedObstacles.Count > 0)
             {
                 _undoStack.Push(new UserAction(ActionType.AddRandomObstacles, addedObstacles));
-                UpdateStatus($"{addedObstacles.Count} rastgele engel eklendi.");
+                UpdateStatus($"{addedObstacles.Count} adet engel eklendi.");
                 picGrid.Invalidate();
             }
         }
 
         private void btnUndo_Click(object sender, EventArgs e)
         {
-            if (_undoStack.Count == 0) return;
+            if (_undoStack.Count == 0 || _gridState == null || _routeManager == null) return;
 
             var lastAction = _undoStack.Pop();
             switch (lastAction.Type)
@@ -127,7 +145,7 @@ namespace RouteUI
                         n.State = CellState.Empty;
                         _routeManager.ToggleObstacle(n.Id);
                     }
-                    UpdateStatus("Son eklenen rastgele engeller kaldırıldı.");
+                    UpdateStatus("Engeller geri alındı.");
                     break;
             }
             picGrid.Invalidate();
@@ -135,46 +153,32 @@ namespace RouteUI
 
         private async void btnRunTest_Click(object sender, EventArgs e)
         {
-            if (_gridState?.StartNode == null || _gridState?.EndNode == null)
+            if (_gridState?.StartNode == null || _gridState?.EndNode == null || _routeManager == null)
             {
-                MessageBox.Show("Başlangıç ve bitiş seçmelisiniz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Başlangıç ve bitiş noktalarını belirlemeden test başlatılamaz.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            // Arayüz hazırlığı
             btnRunTest.Enabled = false;
             dgvResults.Rows.Clear();
             _routeManager.BuildConnections();
 
-            // C# tarafındaki isimlendirme sırası
             string[] queueNames = { "Dizi (Array)", "BST", "Min-Heap" };
-
-            // KRİTİK NOKTA: C++ tarafındaki switch-case yapısına uygun ID eşleştirmesi
-            // C++'ta: 1=Array, 2=MinHeap, 3=BST olarak kodlanmış.
-            int[] cppQueueIds = { 1, 3, 2 };
+            int[] cppQueueIds = { 1, 3, 2 }; // C++ ID'leri ile eşleştirme
 
             for (int i = 0; i < 3; i++)
             {
-                UpdateStatus($"{queueNames[i]} kullanılarak rota aranıyor...");
+                UpdateStatus($"{queueNames[i]} çalışıyor...");
 
-                // 1. Haritayı temizle (Önceki algoritmanın izlerini sil)
-                foreach (var node in _gridState.Nodes)
-                {
-                    if (node.State == CellState.Path || node.State == CellState.Visited)
-                    {
-                        node.State = CellState.Empty;
-                    }
-                }
+                // Ekran temizliği
+                _gridState.ClearPath();
                 picGrid.Invalidate();
-
-                // Temizliği kullanıcının fark etmesi için kısa bir bekleme
                 await Task.Delay(500);
 
-                // 2. Algoritmayı çalıştır (cppQueueIds[i] ile doğru ID'yi gönderiyoruz)
                 Metrics metrics;
                 var result = _routeManager.FindPath(_gridState.StartNode.Id, _gridState.EndNode.Id, cppQueueIds[i], out metrics);
 
-                // 3. Su dalgası animasyonu (Arama süreci)
+                // Tarama Animasyonu
                 foreach (var id in result.Visited)
                 {
                     var n = _gridState.GetNodeById(id);
@@ -182,14 +186,12 @@ namespace RouteUI
                     {
                         n.State = CellState.Visited;
                         picGrid.Invalidate(n.Bounds);
-                        // Harita çok büyükse hızı artırmak için delay'i düşürebilirsin
-                        await Task.Delay(2);
+                        // Harita büyükse hızı artırıyoruz
+                        await Task.Delay(_gridState.Width > 50 ? 1 : 3);
                     }
                 }
 
-                await Task.Delay(150); // Rota çizilmeden önce çok kısa bekle
-
-                // 4. Bitiş yolu (Kırmızı Hat) çizimi
+                // Rota Çizimi
                 if (result.Path.Count > 0)
                 {
                     foreach (var id in result.Path)
@@ -203,23 +205,12 @@ namespace RouteUI
                     picGrid.Invalidate();
                 }
 
-                // 5. Verileri tabloya ekle
-                dgvResults.Rows.Add(
-                    queueNames[i],
-                    $"{metrics.TimeMicroseconds} μs",
-                    metrics.NodesExamined,
-                    metrics.RouteFound ? "Başarılı" : "Başarısız"
-                );
+                dgvResults.Rows.Add(queueNames[i], $"{metrics.TimeMicroseconds} μs", metrics.NodesExamined, metrics.RouteFound ? "Başarılı" : "Başarısız");
 
-                // 6. Bir sonraki algoritma başlamadan önce sonucu görmemiz için bekle
-                if (i < 2)
-                {
-                    UpdateStatus($"{queueNames[i]} bitti. Sonraki bekleniyor...");
-                    await Task.Delay(2000);
-                }
+                if (i < 2) await Task.Delay(2000); // Diğer teste geçmeden bekle
             }
 
-            UpdateStatus("Tüm performans testleri başarıyla tamamlandı.");
+            UpdateStatus("Testler bitti. Sonuçları tablodan inceleyebilirsiniz.");
             btnRunTest.Enabled = true;
         }
 
