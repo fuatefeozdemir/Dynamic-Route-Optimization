@@ -428,5 +428,8 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
+# C++ DLL Çıktı Klasörü
+build_dll/
+
 .idea/
 cmake-build-*/
