@@ -106,7 +106,11 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
                 if (queueType == 1) {
                     arrayQueue->Insert(neighborId, newDist);
                 } else if (queueType == 2) {
-                    minHeap->Push(neighborId, (float)newDist);
+                    if (minHeap->Contains(neighborId)) {
+                        minHeap->DecreaseKey(neighborId, (float)newDist);
+                    } else {
+                        minHeap->Push(neighborId, (float)newDist);
+                    }
                 } else if (queueType == 3) {
                     bstQueue->Insert(neighborId, (double)newDist);
                 }
