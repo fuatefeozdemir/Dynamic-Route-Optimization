@@ -17,6 +17,7 @@ public:
     Stack();
     ~Stack();
 
+
     void Push(int id);     // Yığının en üstüne eleman ekle
     int Pop();             // Yığının en üstündeki elemanı çıkar ve ver
     int Peek();            // En üstteki elemanı çıkarmadan sadece oku

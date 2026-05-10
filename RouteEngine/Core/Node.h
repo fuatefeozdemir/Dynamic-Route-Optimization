@@ -8,12 +8,15 @@ private:
     bool isObstacle;        // Bu kare bir engel mi?
     int distance;           // Dijkstra'nın başlangıçtan buraya gelme maliyeti (distance, o yoldaki weight'lerin toplamıdır)
     int previousNodeId;     // Rotayı bulduktan sonra geriye doğru çizmek için bir önceki adımın ID'si
+    bool visited = false; // Düğümün ziyaret edilip edilmediğini tutar
 
 public:
     // Constructor
     Node(int _id, int _x, int _y);
 
     // Getter Metotlar
+    void SetVisited(bool value) { visited = value; }
+    bool IsVisited() const { return visited; }
     int GetId();
     Point GetCoordinate();
     bool GetIsObstacle();
