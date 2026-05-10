@@ -46,7 +46,7 @@ int ArrayQueue::ExtractMin() {
     // Hızlı Silme İşlemi (O(1)):
     // Aradaki bir elemanı sildiğimizde dizide boşluk kalmaması gerekir.
     // Bütün elemanları kaydırmak (O(N)) çok yavaş olacağı için,
-    // dizinin en sonundaki elemanı, sildiğimiz boşluğa kopyalıyoruz.
+    // dizinin en sonundaki elemanı, sildiğimiz boşluğa yerleştiriyoruz.
     items[minIndex] = items[currentSize - 1];
 
     // Boyutu 1 azaltarak en sondaki elemanı yok sayıyoruz(Bakılan eleman çıkarılıyor)

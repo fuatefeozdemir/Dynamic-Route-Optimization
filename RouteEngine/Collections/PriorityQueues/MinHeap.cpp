@@ -7,43 +7,45 @@ MinHeap::MinHeap(int _capacity) {
     size = 0; // Başlangıçta salon bomboş
     heapArray = new HeapNode[capacity]; // RAM'den kapasite kadar dizi sırası(boş kutu) alır
 
-    nodeIndices = new int[capacity];
+    nodeIndices = new int[capacity];    //bu komşuya bakıldımı diye kontrol için bir dizi oluşturuluyor her kare için.
     for (int i = 0; i < capacity; i++) {
-        nodeIndices[i] = -1;
+        nodeIndices[i] = -1;    // başta hepsine -1 değeri veriyoruz(o komşuya gidilmemiş)
     }
 }
 
-// SALONUN YIKILMASI (Yıkıcı)
+// Yıkıcı fonksiyon
 MinHeap::~MinHeap() {
-    delete[] heapArray; // o devasa diziyi içindeki herkesle beraber RAM'den silip at
-    delete[] nodeIndices;
+    delete[] heapArray; // Minheap için kurulan diziyi siler.
+    delete[] nodeIndices;   //ziyaret edildimi listesini siler.
 }
 
-//  SALON BOŞ MU KONTROLÜ(Dijkstranın moturunu durduran frendir.) true dönerse arama işlemi biter.
+// Gidilecek yol,komşu var mı diye kontrol eder.True dönerse arama işlemi biter.
 bool MinHeap::IsEmpty() {
     return size == 0;
 }
 
 bool MinHeap::Contains(int id) {
-    return nodeIndices[id] != -1;
+    return nodeIndices[id] != -1;   //Bakılan id'deki yola gidildimi diye kontrol eder.
 }
 
 void MinHeap::DecreaseKey(int id, float newDistance) {
-    int index = nodeIndices[id];
-    if (newDistance < heapArray[index].distance) {
-        heapArray[index].distance = newDistance;
-        HeapifyUp(index);
+    int index = nodeIndices[id];    //id si verilerek hangi indekste olduğu yazılır
+    //Dijktra kontrol eder o yola gidildimi diye,eğer gidildiyse id sini alır.
+    if (newDistance < heapArray[index].distance) {  //Bulunan yeni yolun mesafesi ,eski yoldaki maaliyetten küçükse
+        heapArray[index].distance = newDistance;    //daha kısa ise,o yolun mesafesini en kısa olan olarak guncellenir
+        HeapifyUp(index);   //Minheap yapısında doğru yere yerleştirilir.
     }
 }
 
-//İKİ DÜĞÜMÜN YERİNİ DEĞİŞTİRME (Gizli Fonksiyon)
+//İKİ DÜĞÜMÜN YERİNİ DEĞİŞTİRME
 void MinHeap::Swap(int index1, int index2) {
-    nodeIndices[heapArray[index1].id] = index2;
+    // [heapArray[index1].id] bu ifade ile index1'in nodeIndıces dizisinde kaçıncı indekste onu veritor
+    nodeIndices[heapArray[index1].id] = index2; //  İndex1'in nodeIndıces dizisindeki indeks numarası indeks2 olarak değiştiriliyor
     nodeIndices[heapArray[index2].id] = index1;
 
-    HeapNode temp = heapArray[index1];  // 1.düğümü gecici bri odaya alır
-    heapArray[index1] = heapArray[index2];  //2 .düğümü 1 .düğümün boşalan kısmına yerleştirir.
-    heapArray[index2] = temp;   // (temp)1. düğümü 2. düğümün olduğu yere yerleştirir.
+    HeapNode temp = heapArray[index1];  // 1.düğümü gecici bri odaya alır(kaybetmemek için)
+    heapArray[index1] = heapArray[index2];  //2 .düğümü 1 .düğümün boşalan kısmına üstüne yazılır.
+    heapArray[index2] = temp;   // (temp) 1. düğümü 2. düğümün olduğu yere yerleştirir.
 }
 
 
@@ -54,11 +56,11 @@ void MinHeap::Swap(int index1, int index2) {
 void MinHeap::Push(int id, float distance) {
     if (size == capacity) return; // Doluysa ekleme
 
-    // 1. Yeni gelen kişiyi dizinin EN SONUNA atar.
+    // Yeni gelen kişiyi dizinin EN SONUNA atar.
     heapArray[size].id = id;
     heapArray[size].distance = distance;
 
-    nodeIndices[id] = size;
+    nodeIndices[id] = size; // nodeIndıces dizisine eklenen yolun id si (MinHeap teki gibi)verilerek diziye ekleniyor ve içindeki bilgide kaçıncı indekste olduğu.
 
     // Yeni eklenen düğümü ebeveynleriyle kıyaslayarak doğru yere çıkartır.
     HeapifyUp(size);
@@ -84,7 +86,7 @@ void MinHeap::HeapifyUp(int index) {
 // DİJKSTRANIN (KURYENİN) EN KÜÇÜĞÜ ALMASI (ExtractMin ve Sink Down)
 
 // piramidin en tepesindeki(en küçük maaliyetli) alır dijkstaraya verir ve silir.
-// Dijkstra'nın her döngüsünde "Bir sonraki durağım neresi?" sorusunun cevabını veren ana butondur.
+// Dijkstra verilen ekısa yoldan devam ederek komşularına bakar ve bekleme salonuna ekletir.
 int MinHeap::ExtractMin() {
     if (size == 0) return -1; // Salon boşsa hata döndür
 
@@ -98,7 +100,7 @@ int MinHeap::ExtractMin() {
     size--; // Dijkstraya kök verdiğimiz için mevcudu 1 azaltır.
 
     if (size > 0) {
-        nodeIndices[heapArray[0].id] = 0;
+        nodeIndices[heapArray[0].id] = 0;   //Sondan alınıp başa eklenen elemanın id'sini alıve nodeındıces dizisinde indeks nosu 0 olarak yazar.
         // Tepedeki (sondan aldığımız düğümü) kendi dengini bulana kadar aşağı kaydırır
         HeapifyDown(0);
     }
@@ -115,7 +117,8 @@ void MinHeap::HeapifyDown(int index) {
         int rightChild = GetRightChildIndex(currentIndex);  //sağ çocugunun numarasını verir(karşılaştırma için)
         int smallest = currentIndex; // Şimdilik en küçük tepedeki düğüm diyelim
 
-        // Sol çocuğu var mı? Ve ondan daha mı küçük?
+        //Çocugun olup olmadığını anlamak için:formulun ürettiği sayının ,bekleme salonundaki (size) sayıdan küçük olmasına bakmak
+        // Sol çocuğu var mı?(Boş odaya bakmayalım) Ve ondan daha mı küçük?
         if (leftChild < size && heapArray[leftChild].distance < heapArray[smallest].distance) {
             smallest = leftChild;
         }

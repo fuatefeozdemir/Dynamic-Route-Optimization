@@ -9,7 +9,7 @@ struct HeapNode {
 // Çocuklar arasında bir büyüklük/küçüklük kuralı yoktur.
 class MinHeap {
 private:
-    // Ağacı tutacağımız DİZİ (Evet, ağaç çizeceğiz ama bunu gizlice bir diziyle yapacağız!)
+    // Ağacı tutacağımız DİZİ (Ağaç çizeceğiz ama bunu bir diziyle yapacağız!)
     HeapNode* heapArray;
 
     int capacity; // (Haritadaki toplam kare sayısı)
@@ -23,7 +23,7 @@ private:
     int GetLeftChildIndex(int index) { return (2 * index) + 1; }
     int GetRightChildIndex(int index) { return (2 * index) + 2; }
 
-    //  GİZLİ KURALLAR (Private)
+    //  (Private)
     void Swap(int index1, int index2); // İki işçinin yerini değiştirir
     void HeapifyUp(int index);         // Yeni eklenen düğümü üstteki düğüm ile karşılaştırıp dopru yere koyma (Bubble Up)
     void HeapifyDown(int index);       // Tepede olan düğümü aldıktan sonra en sonki çocuğu tepeye koyar ve kaydırma işlemi yapar. (Sink Down)
