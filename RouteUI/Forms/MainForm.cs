@@ -21,24 +21,46 @@ namespace RouteUI
         public MainForm()
         {
             InitializeComponent();
-            SetupDataGridView();
+            SetupModernUI();
+
+            // Uygulamayı her zaman tam ekran başlatır
+            this.WindowState = FormWindowState.Maximized;
+
             UpdateStatus("Harita boyutlarını girip 'Harita Oluştur' butonuna tıklayın.");
         }
 
-        private void SetupDataGridView()
+        // Tasarımı minimal ve flat hale getiren görsel ayarlar
+        private void SetupModernUI()
         {
-            dgvResults.BackgroundColor = Color.White;
+            // Panel ve kenarlık ayarları
+            panelSidebar.BackColor = Color.FromArgb(248, 249, 250); // Açık, temiz gri
+
+            // Tabloyu (DataGridView) modernize etme
+            dgvResults.BackgroundColor = Color.FromArgb(248, 249, 250);
             dgvResults.BorderStyle = BorderStyle.None;
-            dgvResults.RowTemplate.Height = 40;
-            dgvResults.ColumnHeadersHeight = 45;
+            dgvResults.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dgvResults.DefaultCellStyle.SelectionBackColor = Color.White; // Seçim rengini iptal et
+            dgvResults.DefaultCellStyle.SelectionForeColor = Color.Black;
+            dgvResults.DefaultCellStyle.Padding = new Padding(5);
+            dgvResults.RowTemplate.Height = 45;
+            dgvResults.ColumnHeadersHeight = 50;
             dgvResults.Font = new Font("Segoe UI", 10F);
             dgvResults.EnableHeadersVisualStyles = false;
-            dgvResults.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(240, 240, 240);
-            dgvResults.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black;
+
+            // Tablo Başlıkları
+            dgvResults.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            dgvResults.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(230, 233, 236);
+            dgvResults.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(60, 60, 60);
             dgvResults.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dgvResults.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvResults.MultiSelect = false;
-            dgvResults.Enabled = false; // Kullanıcı tabloya tıklayamasın
+            dgvResults.ColumnHeadersDefaultCellStyle.Padding = new Padding(5);
+
+            // Butonlara Hover (Üzerine gelme) efektleri ekleme
+            btnCreateMap.FlatAppearance.MouseOverBackColor = Color.FromArgb(240, 240, 240);
+            btnRandomObstacles.FlatAppearance.MouseOverBackColor = Color.FromArgb(240, 240, 240);
+            btnUndo.FlatAppearance.MouseOverBackColor = Color.FromArgb(240, 240, 240);
+
+            // Ana buton (Test Başlat) için Hover rengi
+            btnRunTest.FlatAppearance.MouseOverBackColor = Color.FromArgb(0, 100, 190);
         }
 
         private void btnCreateMap_Click(object sender, EventArgs e)
@@ -48,7 +70,6 @@ namespace RouteUI
 
             _routeManager?.Dispose();
             _routeManager = new RouteManager(w, h);
-            // picGrid.Size gönderilerek dinamik ölçekleme sağlanıyor
             _gridState = new GridState(w, h, picGrid.Size);
 
             _undoStack.Clear();
@@ -74,7 +95,7 @@ namespace RouteUI
             if (_gridState == null) return;
 
             var targetNode = _gridState.GetNodeAt(e.Location);
-            if (targetNode == null) return; // Geçersiz bölge kontrolü
+            if (targetNode == null) return;
 
             if (_isSelectingStart)
             {
@@ -96,22 +117,30 @@ namespace RouteUI
             picGrid.Invalidate();
         }
 
-        private void btnRandomObstacles_Click(object sender, EventArgs e)
+        private async void btnRandomObstacles_Click(object sender, EventArgs e)
         {
             if (_gridState == null || _isSelectingStart || _isSelectingEnd || _routeManager == null) return;
+
+            btnRandomObstacles.Enabled = false;
+            btnCreateMap.Enabled = false;
+            btnRunTest.Enabled = false;
+            UpdateStatus("Engeller hesaplanıyor, lütfen bekleyin...");
 
             Random rnd = new Random();
             List<NodeModel> addedObstacles = new List<NodeModel>();
 
-            foreach (var node in _gridState.Nodes)
+            await Task.Run(() =>
             {
-                if (node.State == CellState.Empty && rnd.Next(100) < 20)
+                foreach (var node in _gridState.Nodes)
                 {
-                    node.State = CellState.Obstacle;
-                    _routeManager.ToggleObstacle(node.Id);
-                    addedObstacles.Add(node);
+                    if (node.State == CellState.Empty && rnd.Next(100) < 20)
+                    {
+                        node.State = CellState.Obstacle;
+                        _routeManager.ToggleObstacle(node.Id);
+                        addedObstacles.Add(node);
+                    }
                 }
-            }
+            });
 
             if (addedObstacles.Count > 0)
             {
@@ -119,6 +148,14 @@ namespace RouteUI
                 UpdateStatus($"{addedObstacles.Count} adet engel eklendi.");
                 picGrid.Invalidate();
             }
+            else
+            {
+                UpdateStatus("Haritaya engel eklenmedi.");
+            }
+
+            btnRandomObstacles.Enabled = true;
+            btnCreateMap.Enabled = true;
+            btnRunTest.Enabled = true;
         }
 
         private void btnUndo_Click(object sender, EventArgs e)
@@ -164,13 +201,12 @@ namespace RouteUI
             _routeManager.BuildConnections();
 
             string[] queueNames = { "Dizi (Array)", "BST", "Min-Heap" };
-            int[] cppQueueIds = { 1, 3, 2 }; // C++ ID'leri ile eşleştirme
+            int[] cppQueueIds = { 1, 3, 2 };
 
             for (int i = 0; i < 3; i++)
             {
                 UpdateStatus($"{queueNames[i]} çalışıyor...");
 
-                // Ekran temizliği
                 _gridState.ClearPath();
                 picGrid.Invalidate();
                 await Task.Delay(500);
@@ -178,20 +214,32 @@ namespace RouteUI
                 Metrics metrics;
                 var result = _routeManager.FindPath(_gridState.StartNode.Id, _gridState.EndNode.Id, cppQueueIds[i], out metrics);
 
-                // Tarama Animasyonu
+                int totalVisited = result.Visited.Count;
+                double uiDurationMs = metrics.TimeMicroseconds * 0.2;
+                uiDurationMs = Math.Max(1500, Math.Min(uiDurationMs, 20000));
+
+                int totalFrames = Math.Max(1, (int)(uiDurationMs / 15.0));
+                int batchSize = Math.Max(1, totalVisited / totalFrames);
+                int stepCounter = 0;
+
                 foreach (var id in result.Visited)
                 {
                     var n = _gridState.GetNodeById(id);
                     if (n != null && n.State == CellState.Empty)
                     {
                         n.State = CellState.Visited;
-                        picGrid.Invalidate(n.Bounds);
-                        // Harita büyükse hızı artırıyoruz
-                        await Task.Delay(_gridState.Width > 50 ? 1 : 3);
+                        stepCounter++;
+
+                        if (stepCounter % batchSize == 0)
+                        {
+                            picGrid.Invalidate();
+                            await Task.Delay(15);
+                        }
                     }
                 }
 
-                // Rota Çizimi
+                picGrid.Invalidate();
+
                 if (result.Path.Count > 0)
                 {
                     foreach (var id in result.Path)
@@ -207,7 +255,7 @@ namespace RouteUI
 
                 dgvResults.Rows.Add(queueNames[i], $"{metrics.TimeMicroseconds} μs", metrics.NodesExamined, metrics.RouteFound ? "Başarılı" : "Başarısız");
 
-                if (i < 2) await Task.Delay(2000); // Diğer teste geçmeden bekle
+                if (i < 2) await Task.Delay(2000);
             }
 
             UpdateStatus("Testler bitti. Sonuçları tablodan inceleyebilirsiniz.");

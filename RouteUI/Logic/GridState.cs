@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using RouteUI.Models;
 
 namespace RouteUI.Logic
@@ -10,8 +9,9 @@ namespace RouteUI.Logic
     {
         public int Width { get; }
         public int Height { get; }
-        public int CellSize { get; private set; }
-        private Size _availableSize;
+        public float CellSize { get; private set; }
+        public int PixelWidth { get; private set; }
+        public int PixelHeight { get; private set; }
 
         public List<NodeModel> Nodes { get; private set; }
         public NodeModel? StartNode { get; private set; }
@@ -21,23 +21,27 @@ namespace RouteUI.Logic
         {
             Width = width;
             Height = height;
-            _availableSize = availableSize;
 
-            // 1. Dinamik Hücre Boyutu Hesabı (Margin düşülmüş hali)
-            int cellW = (availableSize.Width - 40) / width;
-            int cellH = (availableSize.Height - 40) / height;
-            CellSize = Math.Max(2, Math.Min(cellW, cellH));
+            // Hücrelerin her zaman KARE kalması için X ve Y ekseninden en dar olanın oranı alınır.
+            CellSize = Math.Min(availableSize.Width / (float)width, availableSize.Height / (float)height);
 
-            Nodes = new List<NodeModel>();
+            PixelWidth = (int)(width * CellSize);
+            PixelHeight = (int)(height * CellSize);
 
-            // 2. Izgarayı Oluştur
+            Nodes = new List<NodeModel>(width * height);
+
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
                     int id = y * width + x;
-                    // Koordinatları CellSize ile çarparak bounds oluşturuyoruz
-                    Rectangle bounds = new Rectangle(x * CellSize, y * CellSize, CellSize, CellSize);
+
+                    int px1 = (int)(x * CellSize);
+                    int py1 = (int)(y * CellSize);
+                    int px2 = (int)((x + 1) * CellSize);
+                    int py2 = (int)((y + 1) * CellSize);
+
+                    Rectangle bounds = new Rectangle(px1, py1, px2 - px1, py2 - py1);
                     Nodes.Add(new NodeModel(id, x, y, bounds));
                 }
             }
@@ -59,24 +63,20 @@ namespace RouteUI.Logic
 
         public NodeModel? GetNodeAt(Point location)
         {
-            // Tıklanan koordinatı CellSize'a bölerek X ve Y indekslerini buluyoruz
-            int x = location.X / CellSize;
-            int y = location.Y / CellSize;
+            int x = (int)(location.X / CellSize);
+            int y = (int)(location.Y / CellSize);
 
-            // Sınır kontrolü (Index was out of range hatasını önler)
             if (x >= 0 && x < Width && y >= 0 && y < Height)
             {
                 int id = (y * Width) + x;
-                if (id >= 0 && id < Nodes.Count)
-                    return Nodes[id];
+                return Nodes[id];
             }
             return null;
         }
 
         public NodeModel? GetNodeById(int id)
         {
-            if (id >= 0 && id < Nodes.Count)
-                return Nodes[id];
+            if (id >= 0 && id < Nodes.Count) return Nodes[id];
             return null;
         }
 

@@ -13,18 +13,38 @@ namespace RouteUI.Rendering
         private static readonly Brush PathBrush = Brushes.Crimson;
         private static readonly Brush VisitedBrush = Brushes.LightSkyBlue;
 
-        private static readonly Pen GridPen = new Pen(Color.FromArgb(230, 230, 230), 1);
+        private static readonly Pen GridPen = new Pen(Color.FromArgb(200, 200, 200), 1);
 
         public static void Draw(Graphics g, GridState gridState)
         {
             if (gridState == null) return;
 
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
+
+            g.Clear(Color.White);
+
             foreach (var node in gridState.Nodes)
             {
-                Brush currentBrush = GetBrushForState(node.State);
+                if (node.State != CellState.Empty)
+                {
+                    Brush currentBrush = GetBrushForState(node.State);
+                    g.FillRectangle(currentBrush, node.Bounds);
+                }
+            }
 
-                g.FillRectangle(currentBrush, node.Bounds);
-                g.DrawRectangle(GridPen, node.Bounds);
+            // Dikey Çizgiler
+            for (int x = 0; x <= gridState.Width; x++)
+            {
+                int lineX = (int)(x * gridState.CellSize);
+                g.DrawLine(GridPen, lineX, 0, lineX, gridState.PixelHeight);
+            }
+
+            // Yatay Çizgiler
+            for (int y = 0; y <= gridState.Height; y++)
+            {
+                int lineY = (int)(y * gridState.CellSize);
+                g.DrawLine(GridPen, 0, lineY, gridState.PixelWidth, lineY);
             }
         }
 

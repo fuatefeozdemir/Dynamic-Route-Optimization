@@ -4,163 +4,312 @@ namespace RouteUI
     {
         private System.ComponentModel.IContainer components = null;
 
-        private System.Windows.Forms.Panel pnlSidebar;
-        private System.Windows.Forms.Label lblTitle;
-        private System.Windows.Forms.Button btnRunTest;
-        private System.Windows.Forms.Button btnUndo;
-        private System.Windows.Forms.Button btnRandomObstacles;
-        private System.Windows.Forms.Button btnCreateMap;
-        private System.Windows.Forms.DataGridView dgvResults;
-        private System.Windows.Forms.Label lblStatus;
-        private System.Windows.Forms.NumericUpDown numHeight;
-        private System.Windows.Forms.Label lblHeight;
-        private System.Windows.Forms.NumericUpDown numWidth;
-        private System.Windows.Forms.Label lblWidth;
-        private System.Windows.Forms.PictureBox picGrid;
-
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null)) components.Dispose();
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
             base.Dispose(disposing);
         }
 
+        #region Windows Form Designer generated code
+
         private void InitializeComponent()
         {
-            this.pnlSidebar = new System.Windows.Forms.Panel();
-            this.lblTitle = new System.Windows.Forms.Label();
+            this.panelSidebar = new System.Windows.Forms.Panel();
+            this.lblStatus = new System.Windows.Forms.Label();
+            this.dgvResults = new System.Windows.Forms.DataGridView();
             this.btnRunTest = new System.Windows.Forms.Button();
             this.btnUndo = new System.Windows.Forms.Button();
             this.btnRandomObstacles = new System.Windows.Forms.Button();
             this.btnCreateMap = new System.Windows.Forms.Button();
-            this.dgvResults = new System.Windows.Forms.DataGridView();
-            this.lblStatus = new System.Windows.Forms.Label();
-            this.numHeight = new System.Windows.Forms.NumericUpDown();
             this.lblHeight = new System.Windows.Forms.Label();
-            this.numWidth = new System.Windows.Forms.NumericUpDown();
             this.lblWidth = new System.Windows.Forms.Label();
+            this.numHeight = new System.Windows.Forms.NumericUpDown();
+            this.numWidth = new System.Windows.Forms.NumericUpDown();
+            this.lblTitle = new System.Windows.Forms.Label();
             this.picGrid = new System.Windows.Forms.PictureBox();
-
+            this.colVeriYapisi = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colSure = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDugum = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDurum = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.panelSidebar.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvResults)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numHeight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvResults)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picGrid)).BeginInit();
-            this.pnlSidebar.SuspendLayout();
             this.SuspendLayout();
-
             // 
-            // pnlSidebar
+            // panelSidebar
             // 
-            this.pnlSidebar.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
-            this.pnlSidebar.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlSidebar.Controls.Add(this.lblTitle);
-            this.pnlSidebar.Controls.Add(this.dgvResults);
-            this.pnlSidebar.Controls.Add(this.btnRunTest);
-            this.pnlSidebar.Controls.Add(this.btnUndo);
-            this.pnlSidebar.Controls.Add(this.btnRandomObstacles);
-            this.pnlSidebar.Controls.Add(this.btnCreateMap);
-            this.pnlSidebar.Controls.Add(this.numHeight);
-            this.pnlSidebar.Controls.Add(this.lblHeight);
-            this.pnlSidebar.Controls.Add(this.numWidth);
-            this.pnlSidebar.Controls.Add(this.lblWidth);
-            this.pnlSidebar.Controls.Add(this.lblStatus);
-            this.pnlSidebar.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pnlSidebar.Location = new System.Drawing.Point(0, 0);
-            this.pnlSidebar.Name = "pnlSidebar";
-            this.pnlSidebar.Size = new System.Drawing.Size(320, 720);
-
-            // Başlık
-            this.lblTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 13F, System.Drawing.FontStyle.Bold);
-            this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(45, 52, 54);
-            this.lblTitle.Location = new System.Drawing.Point(20, 25);
-            this.lblTitle.Size = new System.Drawing.Size(280, 35);
-            this.lblTitle.Text = "Dinamik Rota Optimizasyonu";
-
-            // Etiketler
-            this.lblWidth.ForeColor = System.Drawing.Color.DimGray;
-            this.lblWidth.Location = new System.Drawing.Point(20, 85);
-            this.lblWidth.Text = "Genişlik (X)";
-            this.numWidth.Location = new System.Drawing.Point(20, 105);
-            this.numWidth.Maximum = new decimal(new int[] { 500, 0, 0, 0 });
-            this.numWidth.Size = new System.Drawing.Size(130, 25);
-
-            this.lblHeight.ForeColor = System.Drawing.Color.DimGray;
-            this.lblHeight.Location = new System.Drawing.Point(165, 85);
-            this.lblHeight.Text = "Yükseklik (Y)";
-            this.numHeight.Location = new System.Drawing.Point(165, 105);
-            this.numHeight.Maximum = new decimal(new int[] { 500, 0, 0, 0 });
-            this.numHeight.Size = new System.Drawing.Size(130, 25);
-
-            // Butonlar
-            StyleLightButton(this.btnCreateMap, "Harita Oluştur", 160);
-            this.btnCreateMap.Click += new System.EventHandler(this.btnCreateMap_Click);
-
-            StyleLightButton(this.btnRandomObstacles, "Rastgele Engel Ekle", 210);
-            this.btnRandomObstacles.Click += new System.EventHandler(this.btnRandomObstacles_Click);
-
-            StyleLightButton(this.btnUndo, "Son İşlemi Geri Al", 260);
-            this.btnUndo.Click += new System.EventHandler(this.btnUndo_Click);
-
-            // Başlat Butonu
-            this.btnRunTest.BackColor = System.Drawing.Color.FromArgb(0, 120, 215);
+            this.panelSidebar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(249)))), ((int)(((byte)(250)))));
+            this.panelSidebar.Controls.Add(this.lblStatus);
+            this.panelSidebar.Controls.Add(this.dgvResults);
+            this.panelSidebar.Controls.Add(this.btnRunTest);
+            this.panelSidebar.Controls.Add(this.btnUndo);
+            this.panelSidebar.Controls.Add(this.btnRandomObstacles);
+            this.panelSidebar.Controls.Add(this.btnCreateMap);
+            this.panelSidebar.Controls.Add(this.lblHeight);
+            this.panelSidebar.Controls.Add(this.lblWidth);
+            this.panelSidebar.Controls.Add(this.numHeight);
+            this.panelSidebar.Controls.Add(this.numWidth);
+            this.panelSidebar.Controls.Add(this.lblTitle);
+            this.panelSidebar.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panelSidebar.Location = new System.Drawing.Point(0, 0);
+            this.panelSidebar.Name = "panelSidebar";
+            this.panelSidebar.Padding = new System.Windows.Forms.Padding(20);
+            this.panelSidebar.Size = new System.Drawing.Size(320, 800);
+            this.panelSidebar.TabIndex = 0;
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.lblStatus.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lblStatus.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
+            this.lblStatus.Location = new System.Drawing.Point(20, 740);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(280, 40);
+            this.lblStatus.TabIndex = 10;
+            this.lblStatus.Text = "Durum: Bekleniyor...";
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+            // 
+            // dgvResults
+            // 
+            this.dgvResults.AllowUserToAddRows = false;
+            this.dgvResults.AllowUserToDeleteRows = false;
+            this.dgvResults.AllowUserToResizeColumns = false;
+            this.dgvResults.AllowUserToResizeRows = false;
+            this.dgvResults.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvResults.BackgroundColor = System.Drawing.Color.White;
+            this.dgvResults.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dgvResults.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvResults.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colVeriYapisi,
+            this.colSure,
+            this.colDugum,
+            this.colDurum});
+            this.dgvResults.Location = new System.Drawing.Point(20, 390);
+            this.dgvResults.Name = "dgvResults";
+            this.dgvResults.ReadOnly = true;
+            this.dgvResults.RowHeadersVisible = false;
+            this.dgvResults.RowTemplate.Height = 25;
+            this.dgvResults.Size = new System.Drawing.Size(280, 200);
+            this.dgvResults.TabIndex = 9;
+            // 
+            // btnRunTest
+            // 
+            this.btnRunTest.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this.btnRunTest.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRunTest.FlatAppearance.BorderSize = 0;
             this.btnRunTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRunTest.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
+            this.btnRunTest.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.btnRunTest.ForeColor = System.Drawing.Color.White;
             this.btnRunTest.Location = new System.Drawing.Point(20, 320);
-            this.btnRunTest.Size = new System.Drawing.Size(275, 50);
-            this.btnRunTest.Text = "PERFORMANS TESTİ BAŞLAT";
+            this.btnRunTest.Name = "btnRunTest";
+            this.btnRunTest.Size = new System.Drawing.Size(280, 45);
+            this.btnRunTest.TabIndex = 8;
+            this.btnRunTest.Text = "PERFORMANS TESTİNİ BAŞLAT";
+            this.btnRunTest.UseVisualStyleBackColor = false;
             this.btnRunTest.Click += new System.EventHandler(this.btnRunTest_Click);
-
-            // DataGridView
-            this.dgvResults.BackgroundColor = System.Drawing.Color.White;
-            this.dgvResults.GridColor = System.Drawing.Color.FromArgb(230, 230, 230);
-            this.dgvResults.Location = new System.Drawing.Point(10, 390);
-            this.dgvResults.Size = new System.Drawing.Size(300, 230);
-            this.dgvResults.RowHeadersVisible = false;
-            this.dgvResults.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvResults.ColumnCount = 4;
-            this.dgvResults.Columns[0].Name = "Veri Yapısı";
-            this.dgvResults.Columns[1].Name = "Süre";
-            this.dgvResults.Columns[2].Name = "Düğüm";
-            this.dgvResults.Columns[3].Name = "Durum";
-
-            // lblStatus
-            this.lblStatus.ForeColor = System.Drawing.Color.FromArgb(83, 92, 104);
-            this.lblStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.lblStatus.Size = new System.Drawing.Size(320, 90);
-            this.lblStatus.Padding = new Padding(15, 0, 15, 10);
-            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.TopLeft;
-
+            // 
+            // btnUndo
+            // 
+            this.btnUndo.BackColor = System.Drawing.Color.White;
+            this.btnUndo.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnUndo.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+            this.btnUndo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnUndo.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.btnUndo.Location = new System.Drawing.Point(20, 255);
+            this.btnUndo.Name = "btnUndo";
+            this.btnUndo.Size = new System.Drawing.Size(280, 40);
+            this.btnUndo.TabIndex = 7;
+            this.btnUndo.Text = "Son İşlemi Geri Al";
+            this.btnUndo.UseVisualStyleBackColor = false;
+            this.btnUndo.Click += new System.EventHandler(this.btnUndo_Click);
+            // 
+            // btnRandomObstacles
+            // 
+            this.btnRandomObstacles.BackColor = System.Drawing.Color.White;
+            this.btnRandomObstacles.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRandomObstacles.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+            this.btnRandomObstacles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnRandomObstacles.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.btnRandomObstacles.Location = new System.Drawing.Point(20, 205);
+            this.btnRandomObstacles.Name = "btnRandomObstacles";
+            this.btnRandomObstacles.Size = new System.Drawing.Size(280, 40);
+            this.btnRandomObstacles.TabIndex = 6;
+            this.btnRandomObstacles.Text = "Rastgele Engel Ekle";
+            this.btnRandomObstacles.UseVisualStyleBackColor = false;
+            this.btnRandomObstacles.Click += new System.EventHandler(this.btnRandomObstacles_Click);
+            // 
+            // btnCreateMap
+            // 
+            this.btnCreateMap.BackColor = System.Drawing.Color.White;
+            this.btnCreateMap.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnCreateMap.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(200)))), ((int)(((byte)(200)))));
+            this.btnCreateMap.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCreateMap.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.btnCreateMap.Location = new System.Drawing.Point(20, 155);
+            this.btnCreateMap.Name = "btnCreateMap";
+            this.btnCreateMap.Size = new System.Drawing.Size(280, 40);
+            this.btnCreateMap.TabIndex = 5;
+            this.btnCreateMap.Text = "Harita Oluştur";
+            this.btnCreateMap.UseVisualStyleBackColor = false;
+            this.btnCreateMap.Click += new System.EventHandler(this.btnCreateMap_Click);
+            // 
+            // lblHeight
+            // 
+            this.lblHeight.AutoSize = true;
+            this.lblHeight.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lblHeight.Location = new System.Drawing.Point(160, 90);
+            this.lblHeight.Name = "lblHeight";
+            this.lblHeight.Size = new System.Drawing.Size(73, 15);
+            this.lblHeight.TabIndex = 4;
+            this.lblHeight.Text = "Yükseklik (Y)";
+            // 
+            // lblWidth
+            // 
+            this.lblWidth.AutoSize = true;
+            this.lblWidth.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.lblWidth.Location = new System.Drawing.Point(20, 90);
+            this.lblWidth.Name = "lblWidth";
+            this.lblWidth.Size = new System.Drawing.Size(65, 15);
+            this.lblWidth.TabIndex = 3;
+            this.lblWidth.Text = "Genişlik (X)";
+            // 
+            // numHeight
+            // 
+            this.numHeight.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.numHeight.Location = new System.Drawing.Point(160, 110);
+            this.numHeight.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numHeight.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numHeight.Name = "numHeight";
+            this.numHeight.Size = new System.Drawing.Size(140, 25);
+            this.numHeight.TabIndex = 2;
+            this.numHeight.Value = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            // 
+            // numWidth
+            // 
+            this.numWidth.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.numWidth.Location = new System.Drawing.Point(20, 110);
+            this.numWidth.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            this.numWidth.Minimum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numWidth.Name = "numWidth";
+            this.numWidth.Size = new System.Drawing.Size(130, 25);
+            this.numWidth.TabIndex = 1;
+            this.numWidth.Value = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            // 
+            // lblTitle
+            // 
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.lblTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(40)))));
+            this.lblTitle.Location = new System.Drawing.Point(20, 30);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(262, 25);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Dinamik Rota Optimizasyonu";
+            // 
             // picGrid
-            this.picGrid.BackColor = System.Drawing.Color.FromArgb(242, 245, 248);
+            // 
+            this.picGrid.BackColor = System.Drawing.Color.White;
             this.picGrid.Dock = System.Windows.Forms.DockStyle.Fill;
             this.picGrid.Location = new System.Drawing.Point(320, 0);
+            this.picGrid.Name = "picGrid";
+            this.picGrid.Size = new System.Drawing.Size(864, 800);
+            this.picGrid.TabIndex = 1;
+            this.picGrid.TabStop = false;
             this.picGrid.Paint += new System.Windows.Forms.PaintEventHandler(this.picGrid_Paint);
             this.picGrid.MouseDown += new System.Windows.Forms.MouseEventHandler(this.picGrid_MouseDown);
-
+            // 
+            // colVeriYapisi
+            // 
+            this.colVeriYapisi.HeaderText = "Veri Yapısı";
+            this.colVeriYapisi.Name = "colVeriYapisi";
+            this.colVeriYapisi.ReadOnly = true;
+            // 
+            // colSure
+            // 
+            this.colSure.HeaderText = "Süre";
+            this.colSure.Name = "colSure";
+            this.colSure.ReadOnly = true;
+            // 
+            // colDugum
+            // 
+            this.colDugum.HeaderText = "Düğüm";
+            this.colDugum.Name = "colDugum";
+            this.colDugum.ReadOnly = true;
+            // 
+            // colDurum
+            // 
+            this.colDurum.HeaderText = "Durum";
+            this.colDurum.Name = "colDurum";
+            this.colDurum.ReadOnly = true;
+            // 
             // MainForm
-            this.ClientSize = new System.Drawing.Size(1280, 720);
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.White;
+            this.ClientSize = new System.Drawing.Size(1184, 800);
             this.Controls.Add(this.picGrid);
-            this.Controls.Add(this.pnlSidebar);
-            this.Text = "Dinamik Rota Optimizasyonu";
-            this.pnlSidebar.ResumeLayout(false);
-            this.pnlSidebar.PerformLayout();
+            this.Controls.Add(this.panelSidebar);
+            this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Dijkstra Optimizasyon Testi";
+            this.panelSidebar.ResumeLayout(false);
+            this.panelSidebar.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvResults)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numHeight)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numWidth)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvResults)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picGrid)).EndInit();
             this.ResumeLayout(false);
+
         }
 
-        private void StyleLightButton(System.Windows.Forms.Button btn, string text, int y)
-        {
-            btn.Text = text;
-            btn.Location = new System.Drawing.Point(20, y);
-            btn.Size = new System.Drawing.Size(275, 38);
-            btn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btn.BackColor = System.Drawing.Color.White;
-            btn.ForeColor = System.Drawing.Color.FromArgb(45, 52, 54);
-            btn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(210, 214, 218);
-            btn.Font = new Font("Segoe UI", 9.5F);
-        }
+        #endregion
+
+        private System.Windows.Forms.Panel panelSidebar;
+        private System.Windows.Forms.Label lblTitle;
+        private System.Windows.Forms.NumericUpDown numHeight;
+        private System.Windows.Forms.NumericUpDown numWidth;
+        private System.Windows.Forms.Label lblHeight;
+        private System.Windows.Forms.Label lblWidth;
+        private System.Windows.Forms.Button btnCreateMap;
+        private System.Windows.Forms.Button btnRandomObstacles;
+        private System.Windows.Forms.Button btnUndo;
+        private System.Windows.Forms.Button btnRunTest;
+        private System.Windows.Forms.DataGridView dgvResults;
+        private System.Windows.Forms.Label lblStatus;
+        private System.Windows.Forms.PictureBox picGrid;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colVeriYapisi;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colSure;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colDugum;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colDurum;
     }
 }
