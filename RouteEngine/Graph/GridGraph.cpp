@@ -1,10 +1,15 @@
 #include "GridGraph.h"
+#include <cstdlib>
+#include <ctime>
 
 // Constructor
 GridGraph::GridGraph(int _width, int _height) {
     width = _width;
     height = _height;
-    
+
+    // Rastgele sayı üreticiyi saat verisiyle başlatıyoruz (Engeller için)
+    srand((unsigned int)time(NULL));
+
     int totalNodes = width * height; // Kullanıcıdan alınan bilgilerle harita boyutu oluşturulur
 
     //Hafızada yer ayırıyoruz. tum harıta ıcın (Dinamik Dizi)
@@ -13,19 +18,12 @@ GridGraph::GridGraph(int _width, int _height) {
     //yol cızecıgım komsular ıcın yer
     adjacencyList = new LinkedList[totalNodes];
 
-    //Haritayı hücrelerle dolduruyoruz. Yanı koca harıtadakı her kucuk kutucuga ıd verıyoruz
-    // Anlaşılır ve klasik iç içe for döngüleri kullanıyoruz.
+    // Haritadaki her hücreye sırayla id verilir
     int currentId = 0;
     for (int y = 0; y < height; y++) {           // Satırları geziyoruz (Yukarıdan aşağı)
         for (int x = 0; x < width; x++) {        // Sütunları geziyoruz (Soldan sağa)
-
-            // Fabrikadan yeni bir Node çıkarıyoruz ve dizimize ekliyoruz.
             nodes[currentId] = new Node(currentId, x, y);
-            /*yanı koca boş yer actık sonra o yerın ıcıne
-             *tek tek asıl adresler ve ıdlerle doldurduk ondan ıkı tane new yer acma var
-             */
-
-            currentId++; // ID'yi bir sonraki kare için artırıyoruz (0, 1, 2... 2499)
+            currentId++;
         }
     }
 
@@ -34,17 +32,17 @@ GridGraph::GridGraph(int _width, int _height) {
 
 }
 
-// KİMLİK NO İLE HÜCRE BULMA
-//duvar falan koyarken hucreyı bulmak ıcın
+// Hücre idsini verir
 Node* GridGraph::GetNode(int id) {
-    // Güvenlik: İstenen ID harita sınırları içinde mi?
+    // istenen ID harita sınırları içinde mi?
     if (id >= 0 && id < (width * height)) {
         return nodes[id]; // Diziden o hücreyi bul ve gönder
     }
-    return nullptr; // Eğer hatalı bir ID ise "Boş/Yok" (null) döndür
+    return nullptr; // Eğer yoksa null döndür
 }
-//yıkıcı metot
-GridGraph::~GridGraph() {//Ana haritanın her seyini temizliyoruz ramdan
+
+// Yıkıcı Metot
+GridGraph::~GridGraph() {
     int totalNodes = width * height;
 
     //her Node'u tek tek siliyoruz
@@ -55,7 +53,7 @@ GridGraph::~GridGraph() {//Ana haritanın her seyini temizliyoruz ramdan
     //Sonra bu Node'ları tutan ana listeyi siliyoruz
     delete[] nodes;
 
-    //komşuluk listesini komple siliyoruz
+    // Komşuluk listesi siliniyor
     delete[] adjacencyList;
 }
 
@@ -87,6 +85,7 @@ LinkedList* GridGraph::GetNeighbors(int id) {//gidebilecegım adreslerı ver
     }
     return nullptr;
 }
+
 void GridGraph::BuildConnections() {//komsu yolları cızen komsu defterı cıkaran
     //linkedlistin içini dolduran
     int totalNodes = width * height;
@@ -127,6 +126,7 @@ void GridGraph::BuildConnections() {//komsu yolları cızen komsu defterı cıka
         }
     }
 }
+
 //  HÜCREYİ DUVAR YAPMA VEYA DUVARI YIKMA
 //Toogle tersini döndürür
 void GridGraph::ToggleObstacle(int id) {
@@ -140,8 +140,116 @@ void GridGraph::ToggleObstacle(int id) {
         // Tam tersine çevir (Duvar varsa yol yap, yolsa duvar yap)
         targetNode->SetIsObstacle(!currentState);
 
-        BuildConnections();
-        //yollar eskisi gibi kalmasın(komşuluk listeleri guncellenmeli) diye yeniden harita kurulmalı
-
+        // NOT: Buradaki BuildConnections çağrısını sildik.
+        // Çünkü art arda 10.000 engel eklendiğinde her seferinde grafı yeniden kurmak sistemi kilitler.
+        // Bağlantılar artık işlem bitince topluca kurulacak.
     }
+}
+
+// --- YENİ EKLENEN PERFORMANS (TOPLU İŞLEM) FONKSİYONLARI ---
+
+int* GridGraph::GenerateRandomObstacles(int probabilityPercent, int& outCount) {
+    int totalNodes = width * height;
+
+    // En kötü ihtimalle tüm hücreler engel olabilir, geçici bir dizi açıyoruz
+    int* tempObstacles = new int[totalNodes];
+    int count = 0;
+
+    for (int i = 0; i < totalNodes; i++) {
+        Node* node = GetNode(i);
+        // Sadece boş olan hücrelere rastgele engel koy (Start/End gibi önceden dolu olmayanlar)
+        if (node != nullptr && !node->GetIsObstacle()) {
+
+            // Verilen ihtimalle (örneğin %20) rastgele sayı çek
+            if ((rand() % 100) < probabilityPercent) {
+                node->SetIsObstacle(true);
+                tempObstacles[count] = i; // Oluşturulan engelin ID'sini kaydet
+                count++;
+            }
+        }
+    }
+
+    outCount = count;
+
+    // Harita bağlantılarını tek tek değil, tüm engeller eklendikten sonra TOPLUCA yeniden kur!
+    if (count > 0) {
+        BuildConnections();
+    }
+
+    // Tam boyutta bir dizi döndür ki C# tarafı Marshal.Copy ile alabilsin
+    if (count == 0) {
+        delete[] tempObstacles;
+        return nullptr;
+    }
+
+    int* finalObstacles = new int[count];
+    for (int i = 0; i < count; i++) {
+        finalObstacles[i] = tempObstacles[i];
+    }
+
+    delete[] tempObstacles;
+    return finalObstacles; // Geri dönen bu dizi EngineAPI tarafından C#'a iletilecek
+}
+
+void GridGraph::ClearAllObstacles() {
+    int totalNodes = width * height;
+    bool needsRebuild = false;
+
+    for (int i = 0; i < totalNodes; i++) {
+        Node* node = GetNode(i);
+        if (node != nullptr && node->GetIsObstacle()) {
+            node->SetIsObstacle(false); // Duvarı yık
+            needsRebuild = true;
+        }
+    }
+
+    // Eğer silinen bir engel olduysa bağlantıları topluca güncelle
+    if (needsRebuild) {
+        BuildConnections();
+    }
+}
+
+void GridGraph::ResetGraph(int newWidth, int newHeight) {
+    int oldTotal = width * height;
+
+    // 1. Eski bellekleri temizle
+    for (int i = 0; i < oldTotal; i++) {
+        delete nodes[i];
+    }
+    delete[] nodes;
+    delete[] adjacencyList;
+
+    // 2. Yeni boyutları ata
+    width = newWidth;
+    height = newHeight;
+    int newTotal = width * height;
+
+    // 3. Yeni bellekleri tahsis et ve haritayı baştan kur
+    nodes = new Node*[newTotal];
+    adjacencyList = new LinkedList[newTotal];
+
+    int currentId = 0;
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            nodes[currentId] = new Node(currentId, x, y);
+            currentId++;
+        }
+    }
+
+
+
+    BuildConnections();
+}
+
+void GridGraph::RemoveObstaclesBatch(int* ids, int count) {
+    if (ids == nullptr || count <= 0) return;
+
+    for (int i = 0; i < count; i++) {
+        Node* node = GetNode(ids[i]);
+        if (node != nullptr && node->GetIsObstacle()) {
+            node->SetIsObstacle(false);
+        }
+    }
+    // Tüm engeller kalktıktan sonra bağlantıları topluca ör
+    BuildConnections();
 }

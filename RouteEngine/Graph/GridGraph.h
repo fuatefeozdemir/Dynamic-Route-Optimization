@@ -29,6 +29,23 @@ public:
     //Arayüzden tıklanan hücreyi Duvar/Yol yapan fonksiyon
     void ToggleObstacle(int id);
 
+    // --- YENİ EKLENEN PERFORMANS (TOPLU İŞLEM) FONKSİYONLARI ---
+
+    // C# döngüsünden kurtulmak için, verilen yüzde ihtimalle C++ içinde rastgele engel üretir.
+    // Oluşturduğu engellerin ID'lerini ve sayısını referans olarak C#'a döndürür.
+    int* GenerateRandomObstacles(int probabilityPercent, int& outCount);
+
+    // Geri al tuşu için tüm engelleri tek seferde temizler.
+    void ClearAllObstacles();
+
+    // Yeni harita boyutları girildiğinde objeyi silmek yerine içini temizleyip yeniden boyutlandırır.
+    void ResetGraph(int newWidth, int newHeight);
+
+    // Verilen ID listesindeki engelleri topluca kaldırır ve haritayı günceller
+    void RemoveObstaclesBatch(int* ids, int count);
+
+    // ------------------------------------------------------------
+
     // Yıkıcı Metot: Program kapanırken RAM'i temizler
     ~GridGraph();//memory leak onler
 

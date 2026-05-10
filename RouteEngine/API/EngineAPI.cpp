@@ -1,4 +1,5 @@
 #include "EngineAPI.h"
+#include "../Algorithms/DijkstraSolver.h" // Sende include eksik olabilir diye ekledim
 
 extern "C" {
     // Harita nesnesini belleğe yerleştirir
@@ -46,6 +47,43 @@ extern "C" {
     __declspec(dllexport) void DeleteVisitedNodes(int* visitedNodes) {
         if (visitedNodes != nullptr) {
             delete[] visitedNodes;
+        }
+    }
+
+    // C# döngüsünden kurtulmak için, verilen yüzde ihtimalle C++ içinde rastgele engel üretir.
+    __declspec(dllexport) int* GenerateRandomObstacles(GridGraph* graph, int probabilityPercent, int* outCount) {
+        if (graph != nullptr && outCount != nullptr) {
+            return graph->GenerateRandomObstacles(probabilityPercent, *outCount);
+        }
+        if (outCount != nullptr) *outCount = 0;
+        return nullptr;
+    }
+
+    // Geri al tuşu için tüm engelleri tek seferde temizler.
+    __declspec(dllexport) void ClearAllObstacles(GridGraph* graph) {
+        if (graph != nullptr) {
+            graph->ClearAllObstacles();
+        }
+    }
+
+    // Yeni harita boyutları girildiğinde objeyi silmek yerine içini temizleyip yeniden boyutlandırır.
+    __declspec(dllexport) void ResetGraph(GridGraph* graph, int newWidth, int newHeight) {
+        if (graph != nullptr) {
+            graph->ResetGraph(newWidth, newHeight);
+        }
+    }
+
+    // Verilen ID listesindeki engelleri topluca kaldırır ve haritayı günceller
+    __declspec(dllexport) void RemoveObstaclesBatch(GridGraph* graph, int* ids, int count) {
+        if (graph != nullptr && ids != nullptr && count > 0) {
+            graph->RemoveObstaclesBatch(ids, count);
+        }
+    }
+
+    // C++'ın oluşturup C#'a gönderdiği int dizilerini (engeller listesi vb.) iş bitince RAM'den silmek için
+    __declspec(dllexport) void FreeIntArray(int* arrayPtr) {
+        if (arrayPtr != nullptr) {
+            delete[] arrayPtr;
         }
     }
 }
