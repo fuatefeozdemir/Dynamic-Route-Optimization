@@ -6,11 +6,17 @@ MinHeap::MinHeap(int _capacity) {
     capacity = _capacity;   // toplam kare sayısı
     size = 0; // Başlangıçta salon bomboş
     heapArray = new HeapNode[capacity]; // RAM'den kapasite kadar dizi sırası(boş kutu) alır
+
+    nodeIndices = new int[capacity];
+    for (int i = 0; i < capacity; i++) {
+        nodeIndices[i] = -1;
+    }
 }
 
 // SALONUN YIKILMASI (Yıkıcı)
 MinHeap::~MinHeap() {
     delete[] heapArray; // o devasa diziyi içindeki herkesle beraber RAM'den silip at
+    delete[] nodeIndices;
 }
 
 //  SALON BOŞ MU KONTROLÜ(Dijkstranın moturunu durduran frendir.) true dönerse arama işlemi biter.
@@ -18,8 +24,23 @@ bool MinHeap::IsEmpty() {
     return size == 0;
 }
 
+bool MinHeap::Contains(int id) {
+    return nodeIndices[id] != -1;
+}
+
+void MinHeap::DecreaseKey(int id, float newDistance) {
+    int index = nodeIndices[id];
+    if (newDistance < heapArray[index].distance) {
+        heapArray[index].distance = newDistance;
+        HeapifyUp(index);
+    }
+}
+
 //İKİ DÜĞÜMÜN YERİNİ DEĞİŞTİRME (Gizli Fonksiyon)
 void MinHeap::Swap(int index1, int index2) {
+    nodeIndices[heapArray[index1].id] = index2;
+    nodeIndices[heapArray[index2].id] = index1;
+
     HeapNode temp = heapArray[index1];  // 1.düğümü gecici bri odaya alır
     heapArray[index1] = heapArray[index2];  //2 .düğümü 1 .düğümün boşalan kısmına yerleştirir.
     heapArray[index2] = temp;   // (temp)1. düğümü 2. düğümün olduğu yere yerleştirir.
@@ -36,10 +57,12 @@ void MinHeap::Push(int id, float distance) {
     // 1. Yeni gelen kişiyi dizinin EN SONUNA atar.
     heapArray[size].id = id;
     heapArray[size].distance = distance;
-    
+
+    nodeIndices[id] = size;
+
     // Yeni eklenen düğümü ebeveynleriyle kıyaslayarak doğru yere çıkartır.
     HeapifyUp(size);
-    
+
     size++; // Salon mevcudunu 1 artır
 }
 //Yeni gelen düğümü MinHeape göre ebeveynleriyle kıyaslayarak(bir üst düğümleriyle) doğru yere yerleştirir.
@@ -66,14 +89,19 @@ int MinHeap::ExtractMin() {
     if (size == 0) return -1; // Salon boşsa hata döndür
 
     // Dijkstraya verilecek olan EN TEPEDEKİ (Kök) kişinin ID'sini kaydet
-    int minId = heapArray[0].id; 
+    int minId = heapArray[0].id;
+
+    nodeIndices[minId] = -1;
 
     // En sondaki düğümü al, temizle ve köke yaz
     heapArray[0] = heapArray[size - 1];
     size--; // Dijkstraya kök verdiğimiz için mevcudu 1 azaltır.
 
-    // Tepedeki (sondan aldığımız düğümü) kendi dengini bulana kadar aşağı kaydırır
-    HeapifyDown(0);
+    if (size > 0) {
+        nodeIndices[heapArray[0].id] = 0;
+        // Tepedeki (sondan aldığımız düğümü) kendi dengini bulana kadar aşağı kaydırır
+        HeapifyDown(0);
+    }
 
     return minId; //En baştaki(kökte) küçük maaliyetli düğümü dondurur.
 }

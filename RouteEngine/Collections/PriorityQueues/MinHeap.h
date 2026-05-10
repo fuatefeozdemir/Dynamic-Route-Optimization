@@ -15,6 +15,8 @@ private:
     int capacity; // (Haritadaki toplam kare sayısı)
     int size;     // Şu an bekleme salonunda kaç kare var?(toplam kaç kişi var salonda)
 
+    int* nodeIndices;
+
     // --- SİHİRLİ MATEMATİK (Diziyi Ağaç Gibi Kullanma Formülleri) ---
     // Bir düğümün indeksini verip, ailesinin indeksini bulduğumuz formüller
     int GetParentIndex(int index) { return (index - 1) / 2; }
@@ -35,4 +37,7 @@ public:
     void Push(int id, float distance); // Yeni komşu bulduğunda, id sini ve maaliyetini ekler.(HeapifyUp çalışır ve paketi doğru yere yerleştirir)
     int ExtractMin();                  // En düşük maliyetli kareyi (Tepedekini) ver ve tepeyi siler(HeapifyDown ile tekrar düzenler.)
     bool IsEmpty();                    // Salon boş mu? (Kuryenin gidecek yeri kalmadıysa döngüyü bitirir)
+
+    bool Contains(int id);
+    void DecreaseKey(int id, float newDistance);
 };
