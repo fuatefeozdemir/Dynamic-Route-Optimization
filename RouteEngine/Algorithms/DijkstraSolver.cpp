@@ -16,40 +16,43 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
     for (int i = 0; i < totalNodes; i++) {
         Node* node = graph->GetNode(i);
         if (node != nullptr) {
-            node->SetDistance(INFINITY_DIST);
-            node->SetPreviousNodeId(-1);
-            node->SetVisited(false);//eski haritadan kalanlari temizlemek için
+            node->SetDistance(INFINITY_DIST);   //herkesin uzaklığı sonsuz olsun
+            node->SetPreviousNodeId(-1);    // buraya nereden geldim bilgisini sil
+            node->SetVisited(false); //eski haritadan kalanlari temizlemek için
         }
     }
 
     //Başlangıç noktasını
     Node* startNode = graph->GetNode(startId);
-    if (startNode) startNode->SetDistance(0);
+    if (startNode) startNode->SetDistance(0);   // başladığı karenin maaliyeti 0 dır.
 
     // Metrikleri başlat
     Timer timer;
     timer.Start();
+    // C# ta göstermek için en başta herşeyi sıfırlıyoruz
     int nodesExamined = 0;//adım attığı kareyi tutar
-    outMetrics.routeFound = false;//yolbulununca trure olcak
-    outMetrics.visitedNodes = nullptr; //Başlangıçta boş //ekrana çizme için kullanıyo su an bos hıc bişi çizme
+    outMetrics.routeFound = false;//yol bulununca true olcak
+    outMetrics.visitedNodes = nullptr; //Başlangıçta boş, ekrana çizme için kullanıyor su an bos hıc bişi çizme
     outMetrics.visitedCount = 0;       //Başlangıçta 0
 
-//baslangıc ile hedef ayni ise kontrolu icin
+// baslangıc ile hedef ayni ise kontrolu icin
     if (startId == endId) {
         outMetrics.routeFound = true;
         outMetrics.pathLength = 0;
         outMetrics.timeMicroseconds = 0; // Hiç zaman harcamadık
-        return nullptr; // Kimseyi yormadan dükkanı kapatıyoruz
+        return nullptr; // programı bitirir.
     }
-
+    //C# taki hedefe ulaşana kadar gidilebilecek yolların gösterimi için animasyon kuyruğu.
     Queue animationQueue;
 
-    //KUYRUK SEÇİMİ
+    //KUYRUK SEÇİMİ(Performans karşılaştırmaları için verilen 3 veriyapı)
     //herhangi birini kullanabilir seçim için işaretçilerini yazıyo ama henüz yer kaplamıyolar
     ArrayQueue* arrayQueue = nullptr;
     MinHeap* minHeap = nullptr;
     BSTQueue* bstQueue = nullptr;
+
 //sıralamalara seçim için numara veriyoruz
+    // C#ta seçilen yapıya göre o veriyapısını dolduruyoruz(Başlangıç noktasını belirtiyoruz)
     if (queueType == 1) {
         //başlangıç nok olan uzaklık
         //fonk bittiği an yok olmasın diye new
@@ -65,13 +68,13 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
 
     //ANA ARAMA DÖNGÜSÜ
     while (true) {
-        int currentId = -1;//başlangıçta id olmadığı için
+        int currentId = -1;//başlangıçta id olmadığı için(currentid-> sırada gidilecek yol)
 
         // Seçilen yapıdan en yakın düğümü çek
         if (queueType == 1) {
-            if (arrayQueue->IsEmpty())
+            if (arrayQueue->IsEmpty())  //boş ise donguden çık
                 break;
-            currentId = arrayQueue->ExtractMin();
+            currentId = arrayQueue->ExtractMin();   //bu fonksiyon ile gidilebilecek en kısa yolu verir
         } else if (queueType == 2) {
             if (minHeap->IsEmpty())//liste boş mu kontrolü
                 break;
@@ -90,12 +93,12 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
  */
 
         Node* currentNode = graph->GetNode(currentId);
-        // Eğer bu kareye daha önce "en kısa yoldan" baktıysak, tekrar bakma!
+        // Farklı yoolardan aynı kareye tekrar gelindiyse,tekrar bakma
         if (currentNode->IsVisited()) continue; // Döngünün başına dön, sıradaki ID'yi çek
 
-        // Artık bu kareye baktığımızı işaretliyoruz
+        // Ziyaret edilmemişse bu kareye baktığımızı işaretliyoruz
         currentNode->SetVisited(true);
-        // 3. İstatistikleri güncelle (Artık bu kareyle resmen ilgileniyoruz)
+        // İstatistikleri güncelle (Bu kareye bakıyoruz)
         nodesExamined++; //bi nevi incelenen kare sayacı
         animationQueue.Enqueue(currentId);//bu mavi animasyon için
        //gidilecek mevcut ıd yı kuyruga atar
@@ -104,17 +107,17 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
         //endID=tıklanan hedef kare
         if (currentId == endId) {
             outMetrics.routeFound = true;//rota bulununca true artık çizebilir
-            break;
+            break;//yolu çizer donguden çıkar
         }
-//Once hedef mi diye balıyoruz kı fazladan adım atmasın o yüzden  komşu bakma sonra
+//Once hedef mi diye bakıyoruz kı fazladan adım atmasın o yüzden  komşu bakma sonraki satırda
 
         int currentDist = currentNode->GetDistance();//burası ustunden oldugum kareyle ılgılenıyo
 
-        // 4. ADIM: KOMŞULARI GEZ
+        // KOMŞULARI GEZME
         LinkedList* neighborsList = graph->GetNeighbors(currentId);
         ListNode* neighborNode = neighborsList->GetHead();//burasıda ustunde oldugum karenin komsu kareleri ile ilgileniyo
 
-        while (neighborNode != nullptr) {
+        while (neighborNode != nullptr) {//butun komşularını geziyoruz
             //komşularin ozellikleri
             int neighborId = neighborNode->TargetNodeId;
             float weight = neighborNode->Weight;
@@ -123,7 +126,7 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
 
             //Engel kontrolü
             if (neighbor->GetIsObstacle()) {
-                neighborNode = neighborNode->Next;
+                neighborNode = neighborNode->Next;  //eğer duvarsa diğer komşuya geç,dongunun başına dön
                 continue;
             }
 //bu komsıyla beraber mesafe ne kadar
@@ -134,12 +137,12 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
             if (newDist < neighbor->GetDistance()) {
                 neighbor->SetDistance(newDist);
                 neighbor->SetPreviousNodeId(currentId);
-
+    //Maaliyet guncellendiği için veri yapılarının bekleme odasına o komşuyu alıyoruz
                 if (queueType == 1) {
-                    arrayQueue->Insert(neighborId, newDist);
+                    arrayQueue->Insert(neighborId, newDist);    //arkaya ekler
                 } else if (queueType == 2) {
-                    if (minHeap->Contains(neighborId)) {
-                        minHeap->DecreaseKey(neighborId, (float)newDist);
+                    if (minHeap->Contains(neighborId)) {//bu komşu zaten içeridemi diye kontrol eder
+                        minHeap->DecreaseKey(neighborId, (float)newDist);   //içeride ise decrease ile yolu gunceller
                     } else {
                         minHeap->Push(neighborId, (float)newDist);
                         //yeni daha kısa yol keşfedince listenin başına alıyo
@@ -148,27 +151,27 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
                     bstQueue->Insert(neighborId, (double)newDist);
                 }
             }
-            neighborNode = neighborNode->Next;
+            neighborNode = neighborNode->Next;  //komşu listemizdeki diğer komşuya geç
         }
     }
 
-    timer.Stop();
+    timer.Stop();   //Metrics (C#'a verilecek rapor) doldurulur
     outMetrics.timeMicroseconds = timer.GetMicroseconds();//total zaman
-    outMetrics.nodesExamined = nodesExamined;//bakılan kare kayit
+    outMetrics.nodesExamined = nodesExamined;//bakılan kare kayit ,bunlar c# a yazdıırılır
 
     //Animasyon verisini C#'a göndermek için Metrics dizisine aktarıyoruz
-    outMetrics.visitedCount = nodesExamined + (outMetrics.routeFound ? 1 : 0);
+    outMetrics.visitedCount = nodesExamined + (outMetrics.routeFound ? 1 : 0);  //yol bulunduysa +1 ekleniyor(son hedef yol)
     if (outMetrics.visitedCount > 0) {
-        outMetrics.visitedNodes = new int[outMetrics.visitedCount];
+        outMetrics.visitedNodes = new int[outMetrics.visitedCount];//kuyruktan diziye aktarma
         for (int i = 0; i < outMetrics.visitedCount; i++) {
-            outMetrics.visitedNodes[i] = animationQueue.Dequeue();
+            outMetrics.visitedNodes[i] = animationQueue.Dequeue();// dequeue ile fıfo mantıgı ile diziye aktarır
         }
     }
 
     //BELLEK TEMİZLİĞİ VE ROTA OLUŞTURMA
     if (!outMetrics.routeFound) {
         //yol bulunamadıysa yani yol uzunlugu 0 ise temizlik yapiyoruz
-        outMetrics.pathLength = 0;
+        outMetrics.pathLength = 0;  //veriyapılarını temizliyoruz
         if (arrayQueue)
             delete arrayQueue;
         if (minHeap)
@@ -205,7 +208,7 @@ int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueTy
     int* finalPath = new int[pathCount];
 
     // 3. İkinci Stack (tempStack) kullanmıyoruz!
-    // Direkt pathStack'ten Pop yaparak diziyi dolduruyoruz.
+    // Direkt pathStack'ten Pop yaparak diziyi dolduruyoruz.(LIFO)
     // Stack'e en son giren "Başlangıç" olduğu için, ilk Pop yapıldığında "Başlangıç" çıkar.
     for (int i = 0; i < pathCount; i++) {
         finalPath[i] = pathStack.Pop();
