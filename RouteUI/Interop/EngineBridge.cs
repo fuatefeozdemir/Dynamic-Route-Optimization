@@ -28,5 +28,24 @@ namespace RouteUI.Interop
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         public static extern void DeleteVisitedNodes(IntPtr visitedNodes);
+
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GenerateRandomObstacles(IntPtr graph, int probabilityPercent, out int outCount);
+
+        // Tüm engelleri sıfırlar
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ClearAllObstacles(IntPtr graph);
+
+        // Haritayı yeni boyutlarla RAM'de yeniden inşa eder
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void ResetGraph(IntPtr graph, int newWidth, int newHeight);
+
+        // C#daki diziyi doğrudan C++ pointerıyla eşler
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void RemoveObstaclesBatch(IntPtr graph, int[] ids, int count);
+
+        // C++'ın oluşturduğu int dizilerini bellekten silmek için Garbage Collector görevi görür
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void FreeIntArray(IntPtr arrayPtr);
     }
 }

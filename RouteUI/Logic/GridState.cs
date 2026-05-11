@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using RouteUI.Models;
@@ -9,66 +8,48 @@ namespace RouteUI.Logic
     {
         public int Width { get; }
         public int Height { get; }
-        public float CellSize { get; private set; }
-        public int PixelWidth { get; private set; }
-        public int PixelHeight { get; private set; }
+        public float CellSize { get; }
+        public float PixelWidth { get; }
+        public float PixelHeight { get; }
 
-        public List<NodeModel> Nodes { get; private set; }
+        public List<NodeModel> Nodes { get; }
         public NodeModel? StartNode { get; private set; }
         public NodeModel? EndNode { get; private set; }
 
-        public GridState(int width, int height, Size availableSize)
+        public GridState(int width, int height, Size containerSize)
         {
             Width = width;
             Height = height;
+            PixelWidth = containerSize.Width;
+            PixelHeight = containerSize.Height;
 
-            // Hücrelerin her zaman KARE kalması için X ve Y ekseninden en dar olanın oranı alınır.
-            CellSize = Math.Min(availableSize.Width / (float)width, availableSize.Height / (float)height);
-
-            PixelWidth = (int)(width * CellSize);
-            PixelHeight = (int)(height * CellSize);
+            // Hücre boyutunu (CellSize) harita ekranına tam sığacak şekilde hesaplar
+            float cellW = PixelWidth / Width;
+            float cellH = PixelHeight / Height;
+            CellSize = cellW < cellH ? cellW : cellH;
 
             Nodes = new List<NodeModel>(width * height);
 
+            int id = 0;
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    int id = y * width + x;
-
-                    int px1 = (int)(x * CellSize);
-                    int py1 = (int)(y * CellSize);
-                    int px2 = (int)((x + 1) * CellSize);
-                    int py2 = (int)((y + 1) * CellSize);
-
-                    Rectangle bounds = new Rectangle(px1, py1, px2 - px1, py2 - py1);
-                    Nodes.Add(new NodeModel(id, x, y, bounds));
+                    RectangleF bounds = new RectangleF(x * CellSize, y * CellSize, CellSize, CellSize);
+                    Nodes.Add(new NodeModel(id++, x, y, bounds));
                 }
             }
         }
 
-        public void SetStartNode(NodeModel node)
-        {
-            if (StartNode != null) StartNode.State = CellState.Empty;
-            StartNode = node;
-            if (node != null) node.State = CellState.Start;
-        }
-
-        public void SetEndNode(NodeModel node)
-        {
-            if (EndNode != null) EndNode.State = CellState.Empty;
-            EndNode = node;
-            if (node != null) node.State = CellState.End;
-        }
-
+        // Tıklanan fare koordinatına (X, Y) denk gelen kareyi bulur
         public NodeModel? GetNodeAt(Point location)
         {
-            int x = (int)(location.X / CellSize);
-            int y = (int)(location.Y / CellSize);
+            int gridX = (int)(location.X / CellSize);
+            int gridY = (int)(location.Y / CellSize);
 
-            if (x >= 0 && x < Width && y >= 0 && y < Height)
+            if (gridX >= 0 && gridX < Width && gridY >= 0 && gridY < Height)
             {
-                int id = (y * Width) + x;
+                int id = (gridY * Width) + gridX;
                 return Nodes[id];
             }
             return null;
@@ -76,16 +57,34 @@ namespace RouteUI.Logic
 
         public NodeModel? GetNodeById(int id)
         {
-            if (id >= 0 && id < Nodes.Count) return Nodes[id];
+            if (id >= 0 && id < Nodes.Count)
+                return Nodes[id];
             return null;
         }
 
+        public void SetStartNode(NodeModel? node)
+        {
+            if (StartNode != null) StartNode.State = CellState.Empty;
+            StartNode = node;
+            if (StartNode != null) StartNode.State = CellState.Start;
+        }
+
+        public void SetEndNode(NodeModel? node)
+        {
+            if (EndNode != null) EndNode.State = CellState.Empty;
+            EndNode = node;
+            if (EndNode != null) EndNode.State = CellState.End;
+        }
+
+        // Yeni bir algoritma test edilmeden önce ekrandaki eski mavi/kırmızı yolları siler
         public void ClearPath()
         {
             foreach (var node in Nodes)
             {
-                if (node.State == CellState.Path || node.State == CellState.Visited)
+                if (node.State == CellState.Visited || node.State == CellState.Path)
+                {
                     node.State = CellState.Empty;
+                }
             }
         }
     }

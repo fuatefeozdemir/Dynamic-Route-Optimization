@@ -9,8 +9,8 @@ namespace RouteUI.Logic
     public class RouteManager : IDisposable
     {
         private IntPtr _graphPtr;
-        public int Width { get; }
-        public int Height { get; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
 
         public RouteManager(int width, int height)
         {
@@ -35,6 +35,54 @@ namespace RouteUI.Logic
             }
         }
 
+        public List<int> GenerateRandomObstacles(int probabilityPercent)
+        {
+            List<int> obstacleIds = new List<int>();
+            if (_graphPtr == IntPtr.Zero) return obstacleIds;
+
+            int count;
+            IntPtr arrayPtr = EngineBridge.GenerateRandomObstacles(_graphPtr, probabilityPercent, out count);
+
+            if (count > 0 && arrayPtr != IntPtr.Zero)
+            {
+                int[] tempArray = new int[count];
+                Marshal.Copy(arrayPtr, tempArray, 0, count);
+                obstacleIds.AddRange(tempArray);
+
+                // C++ tarafında üretilen int dizisini bellekten sil
+                EngineBridge.FreeIntArray(arrayPtr);
+            }
+
+            return obstacleIds;
+        }
+
+        public void RemoveObstaclesBatch(List<int> ids)
+        {
+            if (_graphPtr != IntPtr.Zero && ids != null && ids.Count > 0)
+            {
+                int[] idArray = ids.ToArray();
+                EngineBridge.RemoveObstaclesBatch(_graphPtr, idArray, idArray.Length);
+            }
+        }
+
+        public void ClearAllObstacles()
+        {
+            if (_graphPtr != IntPtr.Zero)
+            {
+                EngineBridge.ClearAllObstacles(_graphPtr);
+            }
+        }
+
+        public void ResetGraph(int newWidth, int newHeight)
+        {
+            if (_graphPtr != IntPtr.Zero)
+            {
+                Width = newWidth;
+                Height = newHeight;
+                EngineBridge.ResetGraph(_graphPtr, newWidth, newHeight);
+            }
+        }
+
         public (List<int> Path, List<int> Visited) FindPath(int startId, int endId, int queueType, out Metrics metrics)
         {
             metrics = new Metrics();
@@ -45,7 +93,7 @@ namespace RouteUI.Logic
             List<int> pathList = new List<int>();
             List<int> visitedList = new List<int>();
 
-            // 1. En Kısa Yolu Yakala
+            // En kısa yol
             if (metrics.RouteFound && metrics.PathLength > 0 && pathPtr != IntPtr.Zero)
             {
                 int[] tempPath = new int[metrics.PathLength];
@@ -54,13 +102,13 @@ namespace RouteUI.Logic
                 EngineBridge.DeletePath(pathPtr);
             }
 
-            // 2. Animasyon (Visited) Dizisini Yakala
+            // Visited düğümler
             if (metrics.VisitedCount > 0 && metrics.VisitedNodes != IntPtr.Zero)
             {
                 int[] tempVisited = new int[metrics.VisitedCount];
                 Marshal.Copy(metrics.VisitedNodes, tempVisited, 0, metrics.VisitedCount);
                 visitedList.AddRange(tempVisited);
-                EngineBridge.DeleteVisitedNodes(metrics.VisitedNodes); // RAM sızıntısını önle
+                EngineBridge.DeleteVisitedNodes(metrics.VisitedNodes);
             }
 
             return (pathList, visitedList);
