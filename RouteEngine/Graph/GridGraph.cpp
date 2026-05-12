@@ -140,13 +140,11 @@ void GridGraph::ToggleObstacle(int id) {
         // Tam tersine çevir (Duvar varsa yol yap, yolsa duvar yap)
         targetNode->SetIsObstacle(!currentState);
 
-        // NOT: Buradaki BuildConnections çağrısını sildik.
         // Çünkü art arda 10.000 engel eklendiğinde her seferinde grafı yeniden kurmak sistemi kilitler.
         // Bağlantılar artık işlem bitince topluca kurulacak.
     }
 }
 
-// --- YENİ EKLENEN PERFORMANS (TOPLU İŞLEM) FONKSİYONLARI ---
 
 int* GridGraph::GenerateRandomObstacles(int probabilityPercent, int& outCount) {
     int totalNodes = width * height;

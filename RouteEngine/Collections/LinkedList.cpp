@@ -1,5 +1,5 @@
 #include "LinkedList.h"
-// 1. Kurucu (İstasyon ilk açıldığında tren boştur)
+// Constructor (ilk açıldığında boştur)
 LinkedList::LinkedList() {
     head = nullptr;
 }
@@ -26,39 +26,36 @@ LinkedList::~LinkedList() {
     head = nullptr;
 }
 void LinkedList::AddEdge(int targetId, int weight) {
-    //Hafızadan yeni bir "Halka" (ListNode) siparişi veriyoruz.
     ListNode* newNode = new ListNode();
 
-    //Halkanın içine komşu bilgilerini yazıyoruz.
+    // Halkanın içine komşu bilgilerini yazıyoruz.
     newNode->TargetNodeId = targetId;
     newNode->Weight = weight;
 
-    //Yeni halkayı listenin en başına bağlıyoruz.
+    // Yeni halkayı listenin en başına bağlıyoruz.
     // Yeni halkanın 'next'i, şu an listenin başında ne varsa orayı göstersin.
     newNode->Next = head;
 
     head = newNode;
 }
-//3.Ekleme İşlemi (Vagonları üretip birbirine bağlama)
+// 3.Ekleme İşlemi
 void LinkedList::Insert(int targetId, float weight) {
-    //Yeni vagonu RAM'de üret (new komutu ile)
     ListNode* newNode = new ListNode();
     newNode->TargetNodeId = targetId;
     newNode->Weight = weight;
-    newNode->Next = nullptr; //Yeni vagonun arkası şimdilik boş
+    newNode->Next = nullptr;
 
-    //Eğer tren tamamen boşsa, ilk vagon (lokomotif) bu olsun
+    // Eğer liste boşsa head yap
     if (head == nullptr) {
         head = newNode;
         return; //İşimiz bitti, fonksiyondan çık
     }
 
-    //Tren boş değilse, en sona kadar git ve oraya tak
     ListNode* current = head;
     while (current->Next != nullptr) {
-        current = current->Next; //Vagonları tek tek gez
+        current = current->Next; //Düğümleri tek tek gez
     }
-    current->Next = newNode; //Son vagonu bulduk, yeni vagonu kancaya tak!
+    current->Next = newNode; //Kuyruk bulundu
 }
 
 //4.Arama / Okuma İşlemi

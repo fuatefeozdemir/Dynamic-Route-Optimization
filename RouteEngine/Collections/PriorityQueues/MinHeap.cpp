@@ -1,6 +1,6 @@
 #include "MinHeap.h"
 
-// BEKLEME SALONUNUN İNŞASI (Kurucu)
+// Constructor
 //haritada ne kadar kare varsa o kadar boş bir dizi tutar.
 MinHeap::MinHeap(int _capacity) {
     capacity = _capacity;   // toplam kare sayısı

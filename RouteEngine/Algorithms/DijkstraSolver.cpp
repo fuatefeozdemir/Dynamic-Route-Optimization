@@ -6,7 +6,7 @@
 #include "../Collections/Stack.h"
 #include "../Collections/Queue.h"
 
-const int INFINITY_DIST = 999999;//sonsuz mesafe
+const int INFINITY_DIST = 999999; // Sonsuz mesafe
 
 //Graf=Harita,başlangıç bitiş ıd,queueType=hangi arama yöntemini kullanayım,etrics& outMetrics=kaç kareye ne kadar süreyle baktığını yazmak için
 int* DijkstraSolver::Solve(GridGraph* graph, int startId, int endId, int queueType, Metrics& outMetrics) {

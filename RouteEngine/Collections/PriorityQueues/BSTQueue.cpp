@@ -1,6 +1,6 @@
 #include "BSTQueue.h"
 
-// KURUCU: Başlangıçta kök boştur
+// Constructor
 BSTQueue::BSTQueue() : root(nullptr) {}
 //ınsert gelınce dırekt burası bos deyıp ekleyebılsın dıye
 // YIKICI: Bellek sızıntısı olmaması için ağacı temizler
@@ -52,7 +52,7 @@ int BSTQueue::ExtractMin() {
     //2.ADIM: Veriyi (ID) alalım
     int minId = current->id;
 
-    // 3. ADIM: Düğümü ağaçtan koparma (Kritik nokta!)
+    // 3. ADIM: Düğümü ağaçtan koparma
     if (parent == nullptr) {
         // Eğer kök düğümün kendisi en küçükse (solu yoksa)
         // Kökü sağdaki çocuğuna devret
