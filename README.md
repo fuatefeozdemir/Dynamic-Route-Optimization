@@ -13,7 +13,6 @@ Performans ölçümlerini sağlıklı yapabilmek ve arayüzü bu yükten izole e
 ## 🧠 Algoritma Mantığı
 
 * **Dijkstra Algoritması:** İki düğüm arasındaki en kısa yolu bulmak için kullanılır ve duraklar arası her bir rota segmentini hesaplar.
-* **Açgözlü Yaklaşım (Greedy):** Bulunulan konumdan henüz ziyaret edilmemiş en yakın hedefi seçerek Dijkstra'yı tetikleyen, çoklu durak sıralamasını belirleyen üst stratejidir.
 
 ## 🏗️ Geliştirilen Veri Yapıları
 
