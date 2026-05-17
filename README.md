@@ -1,6 +1,6 @@
 # Dynamic Route Optimization
 
-Bu proje, bir başlangıç noktasından çoklu hedef noktalarına giden en kısa yolu bulurken, arka planda çalışan farklı veri yapılarının performanslarını karşılaştırmayı amaçlar. Temel hedef; rota hesaplama süreçlerinde kullanılan **Dizi (Array)**, **İkili Arama Ağacı (BST)** ve **Min-Heap** veri yapılarının hız ve verimlilik açısından nasıl farklılık gösterdiğini test etmek ve bu sonuçları anlık olarak görselleştirmektir.
+Bu proje, bir başlangıç noktasından hedef noktasına giden en kısa yolu bulurken, arka planda çalışan farklı veri yapılarının performanslarını karşılaştırmayı amaçlar. Temel hedef; rota hesaplama süreçlerinde kullanılan **Dizi (Array)**, **İkili Arama Ağacı (BST)** ve **Min-Heap** veri yapılarının hız ve verimlilik açısından nasıl farklılık gösterdiğini test etmek ve bu sonuçları anlık olarak görselleştirmektir.
 
 ## 📁 Proje Mimarisi
 
