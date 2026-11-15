@@ -33,7 +33,3 @@ Motor tarafında projeye özel olarak kodlanan veri yapıları ve görevleri şu
 - **Çekirdek Motor (Backend):** C++
 - **Kullanıcı Arayüzü (Frontend):** C# (.NET), Windows Forms
 - **Geliştirme Ortamları (IDE):** Visual Studio 2026, CLion
-
-## Katkıda Bulunanlar
-
-Bu proje bir ekip çalışması sonucunda geliştirilmiştir. Projeye emek veren tüm geliştiricilere repo'nun sağ panelinde yer alan **Contributors** sekmesinden ulaşabilirsiniz.
